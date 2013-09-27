@@ -1,0 +1,6 @@
+table  begin filter
+  policy INPUT FORWARD OUTPUT DROP
+  target DROP ; proto tcp
+  wd filter
+  include chain/output chain/input chain/forward
+table  end filter

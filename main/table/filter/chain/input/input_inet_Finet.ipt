@@ -1,0 +1,7 @@
+output - ; input - 
+
+
+proto -
+
+
+include input_inet_icmpFinet input_inet_tcpFinet input_inet_udpFinet input_inet_dropFinet

@@ -1,0 +1,14 @@
+  log-way=to
+  chain 2inet 2lan 2local OUTPUT
+  wd chain/output
+
+  proto -
+  output $ifinet    ; target 2inet  ; rule comment(outputI)
+  cmp -A OUTPUT -o enp2s0 -j 2inet -m comment --comment outputI
+  include output_inet
+  output $iflan     ; target 2lan   ; rule comment(outputA)
+  cmp -A OUTPUT -o enp4s0 -j 2lan -m comment --comment outputA
+  include output_lan
+  output $iflocal   ; target 2local ; rule comment(outputO)
+  cmp -A OUTPUT -o lo -j 2local -m comment --comment outputO
+  include output_local

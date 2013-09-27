@@ -1,0 +1,10 @@
+log-level=7
+log-ipt-pref=ipt4
+log-plus=
+log-drop-msg=$log-not-mark $log-way $log-direction$log-plus
+log-drop-message=$log-ipt-pref: $log-drop-msg
+log-accept-message=$log-ipt-pref: $log-accept-msg
+log-yes-mark=YES
+log-not-mark=NOT
+
+log-options=--log-prefix "$log-message" --log-uid --log-tcp-options --log-ip-options --log-level $log-level

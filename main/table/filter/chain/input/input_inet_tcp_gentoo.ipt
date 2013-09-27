@@ -1,0 +1,15 @@
+comment gentoo
+target ask_gentoo
+
+rule spt(rsync) src(+gentoo-rsync)
+cmp -A tcpFinet -i enp2s0 -m tcp -p tcp -s 5.9.69.110,91.186.30.235,140.211.166.189,209.177.148.226 --sport rsync -d $ipinet -j ask_gentoo -m comment --comment gentoo
+# -A tcpFinet $TCP_INET_IN_OPTS -s $RSYNC_GENTOO_LIST --sport rsync                      -j ask_gentoo -m comment --comment gentoo
+
+rule spt(git) 
+cmp -A tcpFinet -i enp2s0 -m tcp -p tcp --sport git -d $ipinet -j ask_gentoo -m comment --comment gentoo
+# -A tcpFinet $TCP_INET_IN_OPTS -s $GIT_GENTOO_LIST   --sport git                        -j ask_gentoo -m comment --comment gentoo
+
+rule spt(ftp) helper(ftp)
+cmp -A tcpFinet -i enp2s0 -m tcp -p tcp -m helper --helper ftp --sport ftp -d $ipinet -j ask_gentoo -m comment --comment gentoo
+# -A tcpFinet $TCP_INET_IN_OPTS -s $FTP_GENTOO_LIST   --sport ftp -m helper --helper ftp -j ask_gentoo -m comment --comment gentoo
+

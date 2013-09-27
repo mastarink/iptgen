@@ -1,0 +1,97 @@
+# --  name: main
+#  ------------------------------------ main
+# --  name: tab_mangle
+#  ------------------------------------ *mangle
+*mangle
+:PREROUTING DROP
+:INPUT DROP
+:FORWARD DROP
+:OUTPUT DROP
+:POSTROUTING DROP
+COMMIT
+# --  name: tab_nat
+#  ------------------------------------ *nat
+*nat
+-A POSTROUTING -s 192.168.71.230 -o enp2s0 -j MASQUERADE
+-A POSTROUTING -s 192.168.71.80/28 -o enp2s0 -j MASQUERADE
+COMMIT
+# --  name: tab_filter
+#  ------------------------------------ *filter
+*filter
+:INPUT DROP
+:FORWARD DROP
+:OUTPUT DROP
+# --  name: output
+#  ------------------------------------ output
+:2inet -
+:2lan -
+:2local -
+-A OUTPUT -o enp2s0 -m comment --comment outputI -j 2inet
+# --  name: output_inet
+-A OUTPUT -o enp4s0 -m comment --comment outputA -j 2lan
+# --  name: output_lan
+# --  name: output_lan_vbox
+:2lan_vbox -
+-A 2lan -p all -s 192.168.71.80/28 -j 2lan_vbox
+-A 2lan -p all -d 192.168.71.80/28 -j 2lan_vbox
+-A 2lan -m tcp -p tcp -d 192.168.71.80/28 -j 2lan_vbox
+-A OUTPUT -o lo -m comment --comment outputO -j 2local
+# --  name: output_local
+# --  name: input
+#  ------------------------------------ input
+:Finet -
+:Flan -
+:Flocal -
+-A INPUT -i enp2s0 -m comment --comment inputI -j Finet
+# --  name: input_inet
+# --  name: input_inet_Finet
+# -A Finet -m icmp -p icmp  --icmp-type any -j icmpFinet
+# -A Finet -m tcp  -p tcp   -j tcpFinet
+# -A Finet -m udp  -p udp   -j udpFinet
+# -A Finet -j dropFinet
+# --  name: input_inet_dropFinet
+:dropFip_msft -
+:dropFip_lstd -
+:dropFip_bad -
+:dropFinet -
+-A dropFinet -s 64.4.0.0/18,65.52.0.0/14,70.37.0.0/17,70.37.128.0/18,111.221.64.0/18,157.54.0.0/15,157.56.0.0/14,157.60.0.0/16,207.46.0.0/16,213.199.160.0/19 -m comment --comment drop-msft -j dropFip_msft
+# -A dropFinet -s $MSFT_ADDRESS_LIST -m comment --comment drop-msft -j dropFip_msft
+-A dropFinet -s 64.4.0.0/18,65.52.0.0/14,70.37.0.0/17,70.37.128.0/18,87.240.128.0/19,88.212.196.64/26,89.184.82.130,93.186.224.0/22,93.186.228.0/22,109.87.83.0/24,111.221.64.0/18,157.54.0.0/15,157.56.0.0/14,157.60.0.0/16,207.46.0.0/16,213.186.116.20,213.199.160.0/19 -m comment --comment other-droplist -j dropFip_lstd
+# -A dropFinet -s $DROP_ADDRESS_LIST -m comment --comment other-droplist -j dropFip_lstd
+-A dropFinet -s 66.175.208.0/20,106.128.0.0/10 -m comment --comment drop-bad -j dropFip_bad
+# -A dropFinet -s $BAD_ADDRESS_LIST -m comment --comment drop-bad -j dropFip_bad
+-A dropFinet -j LOG --log-prefix "ipt4: NOT from inet" --log-uid --log-tcp-options --log-ip-options --log-level 7
+# -A dropFinet -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK from inet " $IPTABLES_LOG_OPTS
+-A dropFinet -j DROP
+-A INPUT -i enp4s0 -m comment --comment inputA -j Flan
+# --  name: input_lan
+-A INPUT -i lo -m comment --comment inputO -j Flocal
+# --  name: input_local
+# --  name: forward
+#  ------------------------------------ input
+:FWFinet -
+:FWFlan -
+:FWFlocal -
+##################################################1
+-A INPUT -i enp2s0 -m comment --comment fwinputI -j FWFinet
+# --  name: fw_input_inet
+#
+-A INPUT -i enp4s0 -m comment --comment fwinputA -j FWFlan
+# --  name: fw_input_lan
+#
+-A INPUT -i lo -m comment --comment fwinputO -j FWFlocal
+# --  name: fw_input_local
+#
+:FW2inet -
+:FW2lan -
+:FW2local -
+-A OUTPUT -o enp2s0 -m comment --comment fwoutputI -j FW2inet
+# --  name: fw_output_inet
+#
+-A OUTPUT -o enp4s0 -m comment --comment fwoutputA -j FW2lan
+# --  name: fw_output_lan
+#
+-A OUTPUT -o lo -m comment --comment fwoutputO -j FW2local
+# --  name: fw_output_local
+#
+COMMIT

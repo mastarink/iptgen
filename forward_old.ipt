@@ -1,0 +1,27 @@
+off
+  chain FWFinet FWFlan FWFlocal FW2inet FW2lan FW2local FORWARD
+
+  proto -
+  input $ifinet  ; target FWFinet  ; rule
+  target DROP ; rule
+
+  input $iflan   ; target FWFlan   ; rule
+  target DROP ; rule
+
+  input $iflocal    ; target FWFlocal ; rule
+  target DROP ; rule
+
+  input -
+  
+  output $ifinet ; target FW2inet  ; rule
+  target DROP ; rule
+  
+  output $iflan  ; target FW2lan   ; rule
+  target DROP ; rule
+
+  output $iflocal   ; target FW2local ; rule
+  target DROP ; rule
+
+  output -
+on
+

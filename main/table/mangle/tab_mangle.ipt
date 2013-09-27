@@ -1,0 +1,13 @@
+off 30
+l-comment on
+  wd mangle
+  table  begin mangle
+    policy PREROUTING INPUT FORWARD OUTPUT POSTROUTING ACCEPT
+# :PREROUTING ACCEPT
+# :INPUT ACCEPT
+# :FORWARD ACCEPT
+# :OUTPUT ACCEPT
+# :POSTROUTING ACCEPT
+  table  end mangle
+l-comment off
+on

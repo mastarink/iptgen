@@ -1,0 +1,9 @@
+off 20
+  wd nat
+  table  begin nat
+    chain POSTROUTING ; target MASQUERADE ; output $ifinet
+
+    rule src(mac.lan)
+    rule src(192.168.71.80/28)
+  table  end nat
+on

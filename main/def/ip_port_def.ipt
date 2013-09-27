@@ -1,0 +1,6 @@
+
+ipinet=193.222.140.165
+
+http_ports=http,https,8080
+im_ports=xmpp-client,5050,aol
+rtmp_port=1935

@@ -1,0 +1,9 @@
+off
+  chain 2lan_vbox
+  chain 2lan
+  target 2lan_vbox ; proto all
+
+  rule src(+virtualbox) proto(all)
+  rule dst(+virtualbox)
+  rule dst(+virtualbox) proto(tcp)
+on
