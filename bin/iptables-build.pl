@@ -88,7 +88,7 @@ sub make_address_array
       my @names=split(/\s+/, $1);
       for my $name (@names)
       {
-        my $ipfname="$confdir/ip/$name.ip";
+        my $ipfname="$confdir/main/ip/$name.ip";
 #       outmsg __LINE__, "B +$name";
 	if (-f $ipfname && open ipfile, $ipfname)
 	{
