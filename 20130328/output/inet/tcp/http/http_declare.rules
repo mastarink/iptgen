@@ -1,0 +1,16 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+:acpt2ihttp -
+:acpt2ihttp_nolog -
+
+:drop2ihttp -
+:drop2ihttp_nolog -
+
+:acpt2ihttp_known -
+:acpt2ihttp_known_nolog -
+
+
+FIL

@@ -1,0 +1,11 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+:2lan_vbox -
+
+-A 2lan_vbox -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_YES_MARK TCP vb to lan " $IPTABLES_LOG_OPTS
+-A 2lan_vbox -j ACCEPT
+
+FIL

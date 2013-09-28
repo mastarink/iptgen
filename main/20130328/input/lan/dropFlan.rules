@@ -1,0 +1,31 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+# lsof -i :5353
+
+cat << FIL
+
+
+
+:dropFlan -
+:tcp_dropFlan -
+:udp_dropFlan -
+:icmp_dropFlan -
+
+# -A udp_dropFlan -m udp -p udp -d $mDNS_ADDRESS --sport mdns -j DROP
+# -A udp_dropFlan -m udp -p udp -s $INET_IP -d $mDNS_ADDRESS --sport mdns --dport mdns -j DROP
+
+
+-A tcp_dropFlan -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK TCP from lan " $IPTABLES_LOG_OPTS
+-A tcp_dropFlan -j DROP
+
+-A icmp_dropFlan -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK ICMP from lan " $IPTABLES_LOG_OPTS
+-A icmp_dropFlan -j DROP
+
+-A udp_dropFlan -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK UDP from lan " $IPTABLES_LOG_OPTS
+-A udp_dropFlan -j DROP
+
+-A dropFlan -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK from lan " $IPTABLES_LOG_OPTS
+-A dropFlan -j DROP
+
+
+FIL

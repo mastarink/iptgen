@@ -1,0 +1,4 @@
+#
+chain tcpFlocal Flocal
+rule proto(tcp) target(tcpFlocal)
+cmp -A Flocal -m tcp  -p tcp   -j tcpFlocal

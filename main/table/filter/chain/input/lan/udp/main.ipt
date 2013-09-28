@@ -1,0 +1,5 @@
+#
+chain udpFlan Flan
+rule proto(udp) target(udpFlan)
+cmp -A Flan -m udp  -p udp   -j udpFlan
+

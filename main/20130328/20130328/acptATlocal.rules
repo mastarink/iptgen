@@ -1,0 +1,11 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+# -A acptATlocal -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_YES_MARK local. " $IPTABLES_LOG_OPTS
+-A acptATlocal -j ACCEPT
+
+
+FIL

@@ -1,0 +1,42 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+:drop2ip_lstd -
+:drop2port_lstd -
+:drop2ip_govua -
+:drop2ip_msft -
+:drop2ip_http -
+:drop2ip_q_http -
+:drop2ip_q_hmas -
+:drop2ip_q_hff -
+:drop2ip_q_hbr -
+:drop2ip_q_skype -
+:drop2ip_q_happ -
+:drop2ip_q_him -
+
+`drop_log LOG drop2ip_lstd    drop to lstd`
+`drop_log LOG drop2port_lstd  drop port lstd`
+`drop_log LOG drop2ip_govua   drop GOV UA`
+`drop_log LOG drop2ip_msft    drop MSFT`
+`drop_log LOG drop2ip_q_hmas  to inet u/d HTTP mastar`
+`drop_log LOG drop2ip_q_hff   to inet u/d HTTP ff`
+`drop_log LOG drop2ip_q_hbr   to inet u/d HTTP br`
+
+`drop_log LOG drop2ip_q_skype to inet u/d H/skype`
+`drop_log LOG drop2ip_q_happ  to inet u/d HTTP app`
+`drop_log LOG drop2ip_q_him   to inet u/d HTTP IM`
+
+
+-A drop2ip_q_http  -m owner --gid-owner 1000 -j drop2ip_q_hmas
+-A drop2ip_q_http  -m owner --gid-owner 1022 -j drop2ip_q_hff
+-A drop2ip_q_http  -m owner --gid-owner 1071 -j drop2ip_q_happ
+-A drop2ip_q_http  -m owner --gid-owner 1067 -j drop2ip_q_hbr
+-A drop2ip_q_http  -m owner --gid-owner 1068 -j drop2ip_q_skype
+-A drop2ip_q_http  -m owner --gid-owner 1073 -j drop2ip_q_him
+
+`drop_log LOG drop2ip_q_http to inet undef HTTP`
+`drop_log LOG drop2ip_http drop HTTP`
+
+FIL

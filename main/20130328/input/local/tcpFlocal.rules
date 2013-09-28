@@ -1,0 +1,19 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+
+:tcpFlocal -
+
+-A tcpFlocal -i $LO_IFACE -j acptFlocal
+
+# ssh remote server, local client
+# >> tcp2local !  -A tcpFlocal -d $BACK_LAN_ADDRESS -s $SSH_LOCAL_SERVERS -m tcp -p tcp --sport ssh  -j acptFlocal -m comment --comment "ssh servers local"
+
+# -A tcpFlocal -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_Q_MARK tcp from local " $IPTABLES_LOG_OPTS
+-A tcpFlocal -j dropFlocal
+
+
+FIL

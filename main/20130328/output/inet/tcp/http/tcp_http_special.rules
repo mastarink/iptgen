@@ -1,0 +1,26 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+# See tcpFinet.rules
+
+
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -d $FACEBOOK_ADDRESS_LIST,$WIKIMEDIA_ADDRESS_LIST,199.7.48.0/20,$GOOGLE_ADDRESS_LIST,$INFORMERS_SINOPTIK_UA,$PRIVATBANK_ADDRESS_LIST,$DROPBOX_ADDRESS_LIST,$PRAVDA_COM_UA_ADDRESS,$CENSOR_NET_UA_ADDRESS_LIST,$TUMBLR_ADDRESS_LIST -j acpt2ihttp_known -m comment --comment "www client"
+
+
+
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -d $AKAMAI_ADDRESS_LIST -j ask_2akamai -m comment --comment "www client AKAMAI"
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -d $MAXMIND_ADDRESS -j acpt2ihttp_known -m comment --comment "www client maxmind / geoip"
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -d $YOUTUBE_ADDRESS_LIST -j acpt2ihttp_known -m comment --comment "www client youtube"
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -d $BBC_ADDRESS_LIST -j acpt2ihttp_known -m comment --comment "www client BBC"
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -d $TWITTER_ADDRESS_LIST -j acpt2ihttp_known -m comment --comment "www client twitter"
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -d $DAILYMOTION_A -j acpt2ihttp_known -m comment --comment "www client dailymotion"
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -d $SAMFIND_ADDRESS -j acpt2ihttp_known -m comment --comment "www client samfind bar"
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -d $BOOKS_ADDRESS_LIST -j acpt2ihttp_known -m comment --comment "www client books"
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -d $BOOKS_ADDRESS_LIST -m owner --gid-owner 1067 -j acpt2ihttp_known -m comment --comment "www client books"
+
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -j acpt2ihttp -m comment --comment "http"
+
+FIL

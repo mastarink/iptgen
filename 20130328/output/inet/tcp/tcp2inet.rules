@@ -1,0 +1,19 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+
+do_iptables_files tcp_declare.rules tcp_torrent2inet.rules tcp_subproto.rules tcp_misc.rules tcp_gentoo.rules tcp_here_servers.rules tcp_skype.rules tcp_rtmp.rules tcp_mail.rules http/tcp_http.rules
+
+
+cat << FIL
+
+
+# See tcpFinet.rules
+
+
+# other #
+-A tcp2inet -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK tcp other to inet " $IPTABLES_LOG_OPTS
+-A tcp2inet -j drop2inet
+
+
+FIL

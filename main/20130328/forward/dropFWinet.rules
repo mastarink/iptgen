@@ -1,0 +1,23 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+do_iptables_files dropFWlstd.rules
+
+cat << FIL
+
+:dropFWinet -
+
+### -A dropFWinet -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_S_MARK drop FW " $IPTABLES_LOG_OPTS
+
+
+-A dropFWinet -d $MSFT_ADDRESS_LIST -m comment --comment msft -j dropFWlstd
+-A dropFWinet -s $MSFT_ADDRESS_LIST -m comment --comment msft -j dropFWlstd
+
+
+-A dropFWinet -s $MIKE_LAN_ADDRESS -m tcp -p tcp --dport http -j DROP
+
+-A dropFWinet -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK fw inet " $IPTABLES_LOG_OPTS
+-A dropFWinet -j DROP
+
+
+FIL

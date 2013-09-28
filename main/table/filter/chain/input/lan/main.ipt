@@ -1,0 +1,13 @@
+input $iflan    ; target Flan   ; rule comment(inputA)
+cmp -A INPUT -i enp4s0 -j Flan -m comment --comment inputA
+
+output - ; input - 
+log-direction=lan
+
+
+proto -
+
+include vbox
+
+
+include icmp/main tcp/main udp/main drop/main

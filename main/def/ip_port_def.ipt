@@ -1,6 +1,7 @@
-
 ipinet=193.222.140.165
-
+iplan=192.168.71.0/24
+ipvbox=192.168.71.80/28
+;
 http_ports=http,https,8080
 im_ports=xmpp-client,5050,aol
 rtmp_port=1935

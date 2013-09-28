@@ -1,0 +1,32 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+
+:udp2lan -
+
+-A udp2lan -m udp -p udp --sport domain										-j udp_acpt2lan
+-A udp2lan -m udp -p udp -m multiport -s $LAN_IP_RANGE --sports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds	-j udp_acpt2lan
+-A udp2lan -m udp -p udp -s $INET_IP,$LAN_IP_RANGE -d $mDNS_ADDRESS --sport mdns --dport mdns			-j udp_acpt2lan
+# -A udp2lan -m udp -p udp -s $LAN_IP_RANGE -d $mDNS_ADDRESS --dport mdns					-j udp_acpt2lan
+
+
+-A udp2lan -m udp -p udp -s $LAN_IP_RANGE --sport 46528							-j ask_skype -m comment --comment skype
+-A udp2lan -m udp -p udp -s 10.0.2.0/24 --sport 46528							-j ask_skype -m comment --comment skype
+
+-A udp2lan -m udp -p udp -d $LAN_IP_RANGE --sport 46528							-j ask_skype -m comment --comment skype
+-A udp2lan -m udp -p udp -d 10.0.2.0/24 --sport 46528							-j ask_skype -m comment --comment skype
+
+
+-A udp2lan  -m udp -p udp --dport bootpc --sport bootps -j udp_acpt2lan -m comment --comment dhcp
+-A udp2lan  -m udp -p udp --dport bootpc --sport bootps -j udp_acpt2lan -m comment --comment dhcp
+
+
+
+# -A udp2lan -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_Q_MARK udp to lan " $IPTABLES_LOG_OPTS
+-A udp2lan -j udp_drop2lan
+
+
+FIL

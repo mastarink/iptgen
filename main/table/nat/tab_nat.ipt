@@ -1,6 +1,24 @@
 off 20
   wd nat
   table  begin nat
+# :PREROUTING ACCEPT
+# :INPUT ACCEPT
+# :OUTPUT ACCEPT
+# :POSTROUTING ACCEPT
+
+
+# :PREROUTING ACCEPT
+# :INPUT ACCEPT
+# :OUTPUT ACCEPT
+# :POSTROUTING ACCEPT
+
+# Accepting forwarded packets via the firewall's internal IP device allows LAN nodes to communicate with each other; 
+# however they still cannot communicate externally to the Internet.
+# To allow LAN nodes with private IP addresses to communicate with external public networks, 
+# configure the firewall for IP masquerading, which masks requests from LAN nodes with the IP address of the firewall's external device
+
+# -A POSTROUTING -s 192.168.71.0/24 -o enp2s0 -j LOG --log-prefix "ipt4: P/R " --log-uid --log-tcp-options --log-ip-options --log-level 7
+# -A POSTROUTING -s 192.168.71.0/24 -o enp2s0 -j MASQUERADE
     chain POSTROUTING ; target MASQUERADE ; output $ifinet
 
     rule src(mac.lan)

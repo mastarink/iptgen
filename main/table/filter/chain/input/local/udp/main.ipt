@@ -1,0 +1,5 @@
+#
+chain udpFlocal Flocal
+rule proto(udp) target(udpFlocal)
+cmp -A Flocal -m udp  -p udp   -j udpFlocal
+

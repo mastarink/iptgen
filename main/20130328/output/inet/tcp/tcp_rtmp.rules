@@ -1,0 +1,19 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+
+
+cat << FIL
+
+
+# See tcpFinet.rules
+
+
+# RTMP
+-A http2inet $TCP_INET_OUT_OPTS -d $TVI_ADDRESS_LIST  -m multiport --dports $HTTP_PORTS -j ask_rtmp -m comment --comment "http client TVI"
+
+-A tcp2inet $TCP_INET_OUT_OPTS -d $TVI_ADDRESS_LIST --dport $RTMP_PORT -j ask_rtmp -m comment --comment "rtmp client TVI"
+# -A tcp2inet $TCP_INET_OUT_OPTS -d $INTV_ADDRESS_LIST --dport $RTMP_PORT -j ask_rtmp -m comment --comment "rtmp client INTV"
+
+
+FIL

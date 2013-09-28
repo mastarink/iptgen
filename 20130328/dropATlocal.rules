@@ -1,0 +1,10 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+`drop_log LOG dropATlocal local`
+
+
+FIL

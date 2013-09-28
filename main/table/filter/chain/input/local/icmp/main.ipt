@@ -1,0 +1,5 @@
+#
+chain icmpFlocal Flocal
+rule proto(icmp)  target(icmpFlocal) lit(--icmp-type any)
+cmp -A Flocal -m icmp -p icmp  --icmp-type any -j icmpFlocal
+

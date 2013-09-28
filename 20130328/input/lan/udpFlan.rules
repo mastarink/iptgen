@@ -1,0 +1,57 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+
+:udpFlan -
+
+-A udpFlan -m udp -p udp --dport domain -j udp_acptFlan
+-A udpFlan -m udp -p udp -m multiport -s $LAN_IP_RANGE --sports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds -j udp_acptFlan
+
+# Skype
+-A udpFlan -m udp -p udp     -s $MAC_LAN_ADDRESS -d $INET_IP -m multiport --sports 64231,51634,36493,63700  -j udp_acptFlan -m comment --comment skype
+# -A udpFlan -m udp -p udp  -d $MAC_LAN_ADDRESS  -d $INET_IP -m multiport --sports 64231,51634,36493,63700  -j udp_acptFlan -m comment --comment skype
+-A udpFlan -m udp -p udp -s $MAC_LAN_ADDRESS  -d $INET_IP -m multiport --dports 64231,51634,36493,63700     -j udp_acptFlan -m comment --comment skype
+# -A udpFlan -m udp -p udp  -d $MAC_LAN_ADDRESS  -d $INET_IP -m multiport --dports 64231,51634,36493,63700  -j udp_acptFlan -m comment --comment skype
+-A udpFlan -m udp -p udp -s $MAC_LAN_ADDRESS,10.0.2.0/24 --dport 46528					    -j udp_acptFlan -m comment --comment skype
+
+
+# mike.lan
+-A udpFlan -m mac --mac-source 00:0e:2e:26:1b:60 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_mike
+# mac.lan
+-A udpFlan -m mac --mac-source 00:14:51:3b:57:8c -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_mac
+# gnome400.lan ?
+-A udpFlan -m mac --mac-source 00:00:1c:d3:d8:73 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_g4
+
+# virtualbox machines
+-A udpFlan -m mac --mac-source 08:00:27:0a:3e:c8 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+-A udpFlan -m mac --mac-source 08:00:27:0f:ee:18 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+-A udpFlan -m mac --mac-source 08:00:27:33:79:df -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+-A udpFlan -m mac --mac-source 08:00:27:37:03:94 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+-A udpFlan -m mac --mac-source 08:00:27:5a:7c:f3 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+-A udpFlan -m mac --mac-source 08:00:27:64:1b:a8 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+-A udpFlan -m mac --mac-source 08:00:27:6A:A8:E3 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+-A udpFlan -m mac --mac-source 08:00:27:9E:08:F7 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+-A udpFlan -m mac --mac-source 08:00:27:df:d0:fa -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+-A udpFlan -m mac --mac-source 08:00:27:e4:69:0f -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+-A udpFlan -m mac --mac-source 08:00:27:e8:f1:3a -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+-A udpFlan -m mac --mac-source 08:00:27:f0:82:3f -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
+
+
+# [Fri Apr  5 11:31:22 2013] ipt: NOT UDP from lan IN=enp4s0 OUT= MAC=01:00:5e:00:00:fb:00:14:51:3b:57:8c:08:00 SRC=192.168.71.230 DST=224.0.0.251 LEN=579 TOS=0x18 PREC=0x00 TTL=255 ID=11713 PROTO=UDP SPT=5353 DPT=5353 LEN=559 
+
+# IGMP : PROTO=2
+# [Fri Apr  5 11:37:26 2013] ipt: NOT from lan IN=enp4s0 OUT= MAC=01:00:5e:00:00:fb:00:14:51:3b:57:8c:08:00 SRC=192.168.71.230 DST=224.0.0.251 LEN=32 TOS=0x00 PREC=0x00 TTL=1 ID=12535 OPT (94040000) PROTO=2 
+
+
+-A udpFlan -m udp -p udp -s $INET_IP,$LAN_IP_RANGE -d $mDNS_ADDRESS --sport mdns --dport mdns -j udp_acptFlan
+
+
+
+
+-A udpFlan -j udp_dropFlan
+
+
+FIL

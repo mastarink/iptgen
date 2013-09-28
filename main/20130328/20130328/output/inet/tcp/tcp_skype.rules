@@ -1,0 +1,19 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+
+cat << FIL
+
+
+# See tcpFinet.rules
+
+
+# clients # >>  91.190.216.9
+# -A tcp2inet $TCP_INET_OUT_OPTS -d  91.190.216.9 --dport http            -j acpt2inet -m comment --comment "skype client"
+
+-A tcp2inet $TCP_INET_OUT_OPTS --dport 12350            -j ask_skype -m comment --comment "skype client"
+-A tcp2inet $TCP_INET_OUT_OPTS --dport 12350            -j ask_skype -m comment --comment "skype client"
+# allow some msft for skype
+-A tcp2inet $TCP_INET_OUT_OPTS -d $MSFT_SKYPE_ADDRESS_LIST --dport 40000:49000 -j ask_skype -m comment --comment "skype client"
+
+FIL

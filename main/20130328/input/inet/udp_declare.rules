@@ -1,0 +1,12 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+
+:udpFinet  -
+
+
+FIL
+

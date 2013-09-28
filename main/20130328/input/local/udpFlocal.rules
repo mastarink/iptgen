@@ -1,0 +1,17 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+
+:udpFlocal -
+
+-A udpFlocal -i $LO_IFACE -j acptFlocal
+-A udpFlocal -m udp -p udp --dport domain -j acptFlocal
+
+# -A udpFlocal -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_Q_MARK udp from local " $IPTABLES_LOG_OPTS
+-A udpFlocal -j dropFlocal
+
+
+FIL

@@ -1,6 +1,7 @@
 table  begin filter
-  policy INPUT FORWARD OUTPUT DROP
-  target DROP ; proto tcp
-  wd filter
-  include chain/output chain/input chain/forward
+  policy INPUT OUTPUT FORWARD $defaut_policy
+  target DROP
+  
+  wd chain ; include output input forward
+
 table  end filter

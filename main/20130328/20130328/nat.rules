@@ -1,0 +1,21 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+# :PREROUTING ACCEPT
+# :INPUT ACCEPT
+# :OUTPUT ACCEPT
+# :POSTROUTING ACCEPT
+
+# Accepting forwarded packets via the firewall's internal IP device allows LAN nodes to communicate with each other; 
+# however they still cannot communicate externally to the Internet.
+# To allow LAN nodes with private IP addresses to communicate with external public networks, 
+# configure the firewall for IP masquerading, which masks requests from LAN nodes with the IP address of the firewall's external device
+
+# -A POSTROUTING -s $LAN_IP_RANGE -o $INET_IFACE -j LOG --log-prefix "$IPT_PREF_PREF: P/R " $IPTABLES_LOG_OPTS
+# -A POSTROUTING -s $LAN_IP_RANGE -o $INET_IFACE -j MASQUERADE
+-A POSTROUTING -s $MAC_LAN_ADDRESS -o $INET_IFACE -j MASQUERADE
+-A POSTROUTING -s $LAN_IP_VB       -o $INET_IFACE -j MASQUERADE
+
+FIL

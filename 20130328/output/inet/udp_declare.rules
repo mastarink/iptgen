@@ -1,0 +1,10 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+
+cat << FIL
+
+:udp2inet -
+
+
+FIL

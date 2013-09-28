@@ -1,0 +1,18 @@
+#
+  chain dropFlan Flan
+  
+  rule target(dropFlan)
+  cmp -A Flan -j dropFlan
+
+  chain dropFlan
+
+# include listed
+
+
+  log-message=$log-drop-message
+  rule target(LOG) $log-options
+  cmp -A dropFlan -j LOG --log-prefix "ipt4: NOT from lan" --log-uid --log-tcp-options --log-ip-options --log-level 7
+  # -A dropFlan -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK from lan " $IPTABLES_LOG_OPTS
+
+  target DROP ; rule
+  cmp -A dropFlan -j DROP

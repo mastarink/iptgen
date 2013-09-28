@@ -1,4 +1,5 @@
 #!/usr/bin/perl
+# ./bin/iptables-build.pl 1000  | grep -- '\(^\s*[[:digit:]]\+\s*-A\s*F\(lan\|inet\)\|ERROR\)'
 
 use strict;
 use strict 'vars';
@@ -9,7 +10,8 @@ use v5.6.0;
 use Net::DNS::Resolver;
 use Net::IP;
 
-my $workdir='main';
+my $incdir;
+my $workdir;
 my $confdir;
 my %control;
 my $current_table;
@@ -19,6 +21,7 @@ my $output_active=1;
 my $only_chain;
 my $output_line_comments=1;
 my $output_namecomment=1;
+my $output_empty_lines=1;
 my ($last_literal, $last_command);
 my @basic_propset=qw/target output input proto dst src ctstate helper comment/;
 sub build_names;
@@ -42,8 +45,18 @@ sub outlog
 
 sub output_literal
 {
-  my ($prefix, @command)=@_;
+  my (@command)=@_;
+  if (0)
   {
+    $last_literal=join(' ', @command);
+    $last_literal=~s/^\s+//;
+    $last_literal=~s/^(:)\s+/$1/;
+#nizzya:   $last_literal=~s/^(\-A.*)$/$1\t\t\t  #--/;
+    print save "$last_literal\n" if (($output_active > 0) && (!$only_chain || $tables{$current_table}{current_chain} eq $only_chain));
+  }
+  else
+  {
+    my $prefix=shift @command;
     my $cmd=join(' ', @command);
     $prefix=~s/^\s+//;
     $cmd=~s/^\s+//;
@@ -176,10 +189,13 @@ sub make_command_table
   {
     $current_table=$command[1];
     output_command '*'.$command[1];
+    output_literal '';
   }
   elsif ( $current_table eq $command[1] && $command[0] eq 'end' )
   {
     undef $current_table;
+    output_literal '';
+    output_literal '';
     output_command 'COMMIT';
   }
   else
@@ -197,10 +213,13 @@ sub make_command_policy
   {
     if ($chain)
     {
-      $tables{$table}{chain}->{$chain}->{policy}=$policy;    
-      if (($policy && $policy ne '-') || $chain!~/^((IN|OUT)PUT|(PRE|POST)ROUTING|FORWARD|LOG)$/)
+      if ( !exists($tables{$table}{chain}->{$chain}->{policy}) )
       {
-	output_command ':', $chain, $policy;
+	if ((($policy && $policy ne '-') || $chain!~/^((IN|OUT)PUT|(PRE|POST)ROUTING|FORWARD|LOG)$/))
+	{
+	  output_command ':', $chain, $policy;
+	}
+	$tables{$table}{chain}->{$chain}->{policy}=$policy;
       }
     }
     else
@@ -350,6 +369,10 @@ sub make_command_namecomment
 {
   $output_namecomment+=make_switch(@_);
 }
+sub make_command_emptylines
+{
+  $output_empty_lines+=make_switch(@_);
+}
 sub make_command_variable
 {
   my ($var, @command)=@_;
@@ -410,6 +433,7 @@ sub make_command
   elsif ($main eq 'name-comment-off') { make_command_namecomment 'off', @command; }
   elsif ($main eq 'name-comment-on')  { make_command_namecomment 'on', @command; }
   elsif ($main eq 'name-comment') { make_command_namecomment @command; }
+  elsif ($main eq 'empty-lines') { make_command_emptylines @command; }
   elsif ($main =~/^([\w-]+)=(.*$)/)
   { make_command_variable $1, ($2,@command); }
   elsif ($main eq 'include')
@@ -418,8 +442,7 @@ sub make_command
   }
   elsif ($main eq 'wd' )
   {
-    $workdir.='/'.shift @command;
-#   outmsg __LINE__, $workdir;
+    $workdir=shift @command;
   }
   elsif ($main eq 'target' 
   	|| $main eq 'proto'
@@ -448,12 +471,12 @@ sub make_commands
   {
     if (/^\s*[#\-]/)
     {
-      outlog "\t\t\tliteral '$_'";
+      outlog __LINE__,"\t\t\tliteral '$_'";
       output_literal "$_" if  $output_line_comments >0;
     }
     elsif (/^\s*$/)
     {
-      output_literal '###' if  $output_line_comments >0;
+      output_literal ''   if  $output_empty_lines >0;
     }
     elsif (/^\s*(.*?)\s*$/)
     {
@@ -473,7 +496,7 @@ sub make_opened_file
   while(<$conf>)
   {
     chomp;
-    if (/^\s*#/)
+    if (/^\s*#/ || /^\s*$/)
     {
       push @command_lines, $_;
     }
@@ -491,14 +514,14 @@ sub make_file
 {
   my ($conffile)=@_;
   local *conf;
-  outlog "opening $conffile\n";
+  outlog __LINE__,"opening $conffile\n";
 # output_literal "# --                      file: $conffile";
   if (open conf, "<$conffile")
   {
-    outlog "opened $conffile\n";
+    outlog __LINE__,"opened $conffile\n";
     make_opened_file \*conf;
     close conf;
-    outlog "closed $conffile\n";
+    outlog __LINE__,"closed $conffile\n";
   }
   else
   {
@@ -509,10 +532,18 @@ sub make_file
 sub build_iptables
 {
   my ($fname)=@_;
-  my $conffile="$confdir/$workdir/$fname.ipt";
+  $incdir="$confdir/main" if (!$incdir);
+  my $conffile="$incdir/$workdir/$fname.ipt";
+  $workdir='';
   if ( -f "$conffile" )
   {
-    outlog "$conffile exists\n";
+    if ($conffile=~/^(.*)\/([^\/]+)$/)
+    {
+      $incdir=$1;
+    }
+##  outmsg __LINE__, "$incdir / $workdir @ $conffile";
+##  outmsg __LINE__, "$conffile exists";
+    outlog __LINE__, "$conffile exists";
     make_file $conffile;
   }
   else
@@ -528,11 +559,11 @@ sub make_confdir
     $confdir="$ENV{MAS_CONF_DIR}/iptables-build";
     if (-d  $confdir)
     {
-      outlog "$confdir exists";
+      outlog __LINE__,"$confdir exists";
     }
     else
     {
-      outlog "$confdir not exists, creating";
+      outlog __LINE__,"$confdir not exists, creating";
       mkdir $confdir;
     }
   }
@@ -549,6 +580,7 @@ sub save_context
   $chain=$tables{$current_table}{current_chain};
   $saved->{current_chain}=$chain;
   $saved->{workdir}=$workdir;
+  $saved->{incdir}=$incdir;
 #     outmsg __LINE__, "PUSH chain $chain";
   for my $prop (@basic_propset)
   {      $saved->{$prop}=$tables{$current_table}{$prop};     }
@@ -563,6 +595,7 @@ sub restore_context
   {     $tables{$current_table}{$prop}=$saved->{$prop};     }
   $chain=$saved->{current_chain};
   $workdir=$saved->{workdir};
+  $incdir=$saved->{incdir};
   if ($chain)
   {
     make_command_chain $chain;
@@ -608,6 +641,9 @@ sub main
 
     make_confdir;
     build_names 'main';
+    output_literal '';
+    output_literal '';
+    output_literal '# vi: ft=iptables';
     close save;
   }
 # if ( open tocat, '<', '/tmp/iptables.build.tmp' )

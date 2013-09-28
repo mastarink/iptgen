@@ -1,0 +1,43 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+export TCP_INET_IN_OPTS="-i $INET_IFACE -d $INET_IP -m tcp -p tcp"
+do_iptables_files tcp_declare.rules tcp_torrentFinet.rules
+
+cat << FIL
+
+
+
+# See tcp2inet.rules
+
+
+# new OK 1
+# RTMP
+-A tcpFinet $TCP_INET_IN_OPTS -s $TVI_ADDRESS_LIST --sport $RTMP_PORT -j ask_rtmp -m comment --comment "rtmp client TVI"
+# -A tcpFinet $TCP_INET_IN_OPTS -s $INTV_ADDRESS_LIST --sport $RTMP_PORT -j ask_rtmp -m comment --comment "rtmp client INTV"
+
+
+# new OK 3
+-A tcpFinet $TCP_INET_IN_OPTS -s $RSYNC_GENTOO_LIST --sport rsync                      -j ask_gentoo -m comment --comment gentoo
+-A tcpFinet $TCP_INET_IN_OPTS -s $GIT_GENTOO_LIST   --sport git                        -j ask_gentoo -m comment --comment gentoo
+#? ?
+-A tcpFinet $TCP_INET_IN_OPTS -s $FTP_GENTOO_LIST   --sport ftp -m helper --helper ftp -j ask_gentoo -m comment --comment gentoo
+
+
+# drop without notice
+-A tcpFinet $TCP_INET_IN_OPTS -m multiport --dports ms-wbt-server,ms-sql-s,microsoft-ds -j dropFport_lstd -m comment --comment "MS WBT Server; Microsoft-SQL-Server; Microsoft-DS"
+
+# servers #
+# new OK 1
+-A tcpFinet $TCP_INET_IN_OPTS --dport http                               -j acptFinet -m comment --comment "my http server"
+
+# clients #
+# -A tcpFinet -p tcp -i $INET_IFACE -d $INET_IP -m state --state ESTABLISHED,RELATED -j acptFinet
+# new OK 3
+-A tcpFinet $TCP_INET_IN_OPTS -m conntrack --ctstate RELATED,ESTABLISHED -j acptFinet
+
+-A tcpFinet $TCP_INET_IN_OPTS -m multiport --sports $HTTP_PORTS           -j acptFinet
+-A tcpFinet $TCP_INET_IN_OPTS -m multiport --sports xmpp-client,5050,aol -j acptFinet
+
+
+
+FIL

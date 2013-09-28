@@ -1,0 +1,16 @@
+#
+  chain dropFlocal Flocal
+  
+  rule target(dropFlocal)
+  cmp -A Flocal -j dropFlocal
+
+  chain dropFlocal
+
+
+  log-message=$log-drop-message
+  rule target(LOG) $log-options
+  cmp -A dropFlocal -j LOG --log-prefix "ipt4: NOT from local" --log-uid --log-tcp-options --log-ip-options --log-level 7
+  # -A dropFlocal -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK from local " $IPTABLES_LOG_OPTS
+
+  target DROP ; rule
+  cmp -A dropFlocal -j DROP

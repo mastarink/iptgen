@@ -1,0 +1,25 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+do_iptables_files  acpt2inet.rules drop2inet.rules tcp/tcp2inet.rules udp2inet.rules icmp2inet.rules
+
+cat << FIL
+
+
+
+:2inet -
+-A OUTPUT -o $INET_IFACE -j 2inet
+
+# See drop2inet.rules
+
+# -A 2inet -m tcp -p tcp -j LOG --log-prefix "$IPT_PREF_PREF: MIDDLE TCP to inet " $IPTABLES_LOG_OPTS
+-A 2inet -m tcp -p tcp -j tcp2inet
+
+# -A 2inet -m udp -p udp -j LOG --log-prefix "$IPT_PREF_PREF: MIDDLE UDP to inet " $IPTABLES_LOG_OPTS
+-A 2inet -m udp -p udp -j udp2inet
+
+-A 2inet -m icmp -p icmp --icmp-type any -j icmp2inet
+-A 2inet -j drop2inet
+
+
+FIL

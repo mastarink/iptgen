@@ -1,5 +1,6 @@
 off
   proto -
-  wd chain/forward
+  wd forward
+
   include fw_input fw_output
 on

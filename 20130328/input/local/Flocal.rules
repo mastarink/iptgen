@@ -1,0 +1,21 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+do_iptables_files acptFlocal.rules dropFlocal.rules tcpFlocal.rules udpFlocal.rules icmpFlocal.rules
+
+cat << FIL
+
+
+
+:Flocal -
+
+# new OK 4
+-A Flocal -m udp -p udp -j udpFlocal
+-A Flocal -m icmp -p icmp  --icmp-type any -j icmpFlocal
+-A Flocal -m tcp -p tcp -j tcpFlocal
+-A Flocal -j dropFlocal
+
+
+FIL
+
+# vi: ft=iptables

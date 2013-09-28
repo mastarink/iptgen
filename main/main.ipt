@@ -1,5 +1,9 @@
 l-comment off
 name-comment off
-include def/log_def def/if_def def/ip_port_def
-wd table
-include mangle/tab_mangle nat/tab_nat filter/tab_filter
+empty-lines off
+defaut_policy=DROP
+;
+wd def
+include log_def if_def ip_port_def
+;
+wd table ; include mangle/tab_mangle nat/tab_nat filter/tab_filter

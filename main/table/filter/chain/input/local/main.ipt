@@ -1,0 +1,11 @@
+input $iflocal  ; target Flocal ; rule comment(inputO)
+cmp -A INPUT -i lo -j Flocal -m comment --comment inputO
+
+
+output - ; input - 
+log-direction=local
+
+
+proto -
+
+include icmp/main tcp/main udp/main drop/main

@@ -1,0 +1,14 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+
+:drop2local -
+
+-A drop2local -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK to local " $IPTABLES_LOG_OPTS
+-A drop2local -j DROP
+
+
+FIL

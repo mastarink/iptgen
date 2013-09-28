@@ -1,4 +1,3 @@
 ifinet=enp2s0
 iflan=enp4s0
 iflocal=lo
-

@@ -2,12 +2,7 @@ off 30
 l-comment on
   wd mangle
   table  begin mangle
-    policy PREROUTING INPUT FORWARD OUTPUT POSTROUTING ACCEPT
-# :PREROUTING ACCEPT
-# :INPUT ACCEPT
-# :FORWARD ACCEPT
-# :OUTPUT ACCEPT
-# :POSTROUTING ACCEPT
+    policy PREROUTING INPUT FORWARD OUTPUT POSTROUTING DROP
   table  end mangle
 l-comment off
 on

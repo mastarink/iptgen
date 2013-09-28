@@ -1,0 +1,17 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+
+-A drop_lstd -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK lstd " $IPTABLES_LOG_OPTS
+-A drop_lstd -j DROP
+
+
+FIL
+
+
+
+
+

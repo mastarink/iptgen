@@ -1,0 +1,17 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+
+cat << FIL
+
+
+# See tcpFinet.rules
+
+
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1067  -j acpt2ihttp -m comment --comment "http gid mastar-browser"
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1024  -j acpt2ihttp -m comment --comment "http gid mastar-http"
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1022  -j acpt2ihttp_nolog -m comment --comment "http gid mastar-firefox"
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner   31  -j acpt2ihttp_nolog -m comment --comment "http gid squid"
+
+
+FIL

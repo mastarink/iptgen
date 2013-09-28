@@ -1,0 +1,25 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+if [[ "$IPTABLES_ALLOW_TORRENT" ]] ; then
+load_torrent_a
+
+
+echo "TORRENT ${#TORRENTA_ADDR_688X_LIST[@]}" >&2
+for (( iset=1 ; $iset < ${#TORRENTA_ADDR_688X_LIST[@]} ; iset++ )) ; do
+
+cat << FIL
+-A udpFinet -m udp -p udp -d $INET_IP -s ${TORRENTA_ADDR_688X_LIST[$iset]} --dport $TORRENT_STD_PORTS -j ask_torrent -m comment --comment torrent
+FIL
+
+done
+
+
+
+else
+
+cat << FIL
+-A udpFinet -m udp -p udp --dport $TORRENT_STD_PORTS -j DROP -m comment --comment torrent
+FIL
+
+fi
+

@@ -1,0 +1,5 @@
+#
+chain icmpFlan Flan
+rule proto(icmp)  target(icmpFlan) lit(--icmp-type any)
+cmp -A Flan -m icmp -p icmp  --icmp-type any -j icmpFlan
+

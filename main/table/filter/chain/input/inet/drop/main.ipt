@@ -1,0 +1,17 @@
+  chain dropFinet Finet
+  
+  rule target(dropFinet)
+  cmp -A Finet -j dropFinet
+
+  chain dropFinet
+
+  include listed
+
+
+  log-message=$log-drop-message
+  rule target(LOG) $log-options
+  cmp -A dropFinet -j LOG --log-prefix "ipt4: NOT from inet" --log-uid --log-tcp-options --log-ip-options --log-level 7
+  # -A dropFinet -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK from inet " $IPTABLES_LOG_OPTS
+
+  target DROP ; rule
+  cmp -A dropFinet -j DROP

@@ -1,0 +1,16 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+
+:icmp2local -
+
+-A icmp2local -o $LO_IFACE -j acpt2local
+
+-A icmp2local -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_Q_MARK ICMP to local " $IPTABLES_LOG_OPTS
+-A icmp2local -j drop2local
+
+
+FIL

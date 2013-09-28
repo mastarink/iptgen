@@ -1,0 +1,14 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+export TCP_INET_IN_OPTS="-i $INET_IFACE -d $INET_IP -m tcp -p tcp"
+
+cat << FIL
+
+
+
+:tcpFinet -
+
+
+
+FIL
+

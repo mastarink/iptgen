@@ -1,0 +1,19 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+do_iptables_files acpt2local.rules drop2local.rules tcp2local.rules udp2local.rules icmp2local.rules
+
+cat << FIL
+
+
+:2local -
+-A OUTPUT -o $LO_IFACE   -j 2local
+
+
+-A 2local -m udp -p udp -j udp2local
+-A 2local -m icmp -p icmp  --icmp-type any -j icmp2local
+-A 2local -m tcp -p tcp -j tcp2local
+-A 2local -j drop2local
+
+
+FIL

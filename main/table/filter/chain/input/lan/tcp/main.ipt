@@ -1,0 +1,11 @@
+#
+chain tcpFlan Flan
+rule proto(tcp) target(tcpFlan)
+cmp -A Flan -m tcp  -p tcp   -j tcpFlan
+
+
+target acptFlan
+
+input $iflan ; dst $iplan ; proto tcp
+
+# include gentoo servers clients

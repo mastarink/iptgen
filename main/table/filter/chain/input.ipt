@@ -1,13 +1,14 @@
   log-way=from
-  wd chain/input
 
   chain Finet Flan Flocal INPUT
 
   proto -
-  include input_main
+  wd input
+  
+  include main
 
   log-direction=all
   log-plus= (default) DROP INPUT
   log-message=$log-drop-message
 
-  include input_final
+  include final

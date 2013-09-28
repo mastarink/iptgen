@@ -1,0 +1,17 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+
+cat << FIL
+
+
+# See tcpFinet.rules
+
+
+# smtp
+# -A tcp2inet $TCP_INET_OUT_OPTS -m owner --gid-owner 248 --dport submission -d $SMTP_SERVERS -j acpt2inet -m comment --comment "smtp mail client"
+-A tcp2inet $TCP_INET_OUT_OPTS  --dport submission -d $SMTP_SERVERS -j acpt2inet -m comment --comment "smtp mail client"
+-A tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports pop3,pop3s -d $POP_SERVERS -j acpt2inet -m comment --comment "pop mail client"
+
+
+FIL

@@ -1,0 +1,32 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+cat << FIL
+
+
+
+:udp2local -
+
+-A udp2local -o $LO_IFACE -s 127.0.0.1 -d 127.0.0.1 -p udp -j acpt2local
+-A udp2local -o $LO_IFACE -s $LAN_IP_RANGE -d $LAN_IP_RANGE -p udp -j acpt2local
+
+
+
+-A udp2local -i $LO_IFACE -j acpt2local
+
+-A udp2local -s 127.0.0.1 -m udp -p udp --sport 40000:58000 -j acpt2local -m comment --comment skype
+-A udp2local -s 127.0.0.1 -m udp -p udp --dport 40000:58000 -j acpt2local -m comment --comment skype
+
+# See tcp2local.rules
+-A udp2local -m udp -p udp --dport domain -j acpt2local
+-A udp2local -m udp -p udp --sport domain -j acpt2local
+
+-A udp2local  -m udp -p udp --sport 46528							-j acpt2local -m comment --comment skype
+
+# ?? -A udp2local -m udp -p udp --sport 52101 -j acpt2local
+
+# -A udp2local -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_Q_MARK udp to local " $IPTABLES_LOG_OPTS
+-A udp2local -j drop2local
+
+
+FIL

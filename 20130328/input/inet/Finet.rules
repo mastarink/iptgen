@@ -1,0 +1,23 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+# new OK: tcpFinet.rules
+do_iptables_files  acptFinet.rules dropFinet.rules tcpFinet.rules udpFinet.rules icmpFinet.rules
+
+cat << FIL
+
+:Finet -
+
+# See dropFinet.rules
+
+# new OK 4
+-A Finet -m icmp -p icmp  --icmp-type any -j icmpFinet
+-A Finet -m tcp  -p tcp   -j tcpFinet
+-A Finet -m udp  -p udp   -j udpFinet
+
+-A Finet -j dropFinet
+
+
+FIL
+
+# vi: ft=iptables

@@ -1,0 +1,18 @@
+#!/bin/sh
+. $MAS_IP_FUNCTIONS
+
+
+cat << FIL
+
+
+# See tcpFinet.rules
+
+-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS  -m owner --gid-owner 250 -j ask_gentoo -m comment --comment gentoo
+
+-A http2inet $TCP_INET_OUT_OPTS -d $HTTP_GENTOO_LIST -m multiport --dports $HTTP_PORTS -j ask_gentoo -m comment --comment gentoo
+
+-A tcp2inet $TCP_INET_OUT_OPTS -d $RSYNC_GENTOO_LIST             --dport rsync       -j ask_gentoo -m comment --comment gentoo
+-A tcp2inet $TCP_INET_OUT_OPTS -d $GIT_GENTOO_LIST               --dport git         -j ask_gentoo -m comment --comment gentoo
+
+
+FIL

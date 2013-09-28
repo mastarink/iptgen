@@ -1,0 +1,10 @@
+input $ifinet   ; target Finet  ; rule comment(inputI)
+cmp -A INPUT -i enp2s0 -j Finet -m comment --comment inputI
+
+output - ; input - 
+log-direction=inet
+
+
+proto -
+
+include icmp/main tcp/main udp/main drop/main
