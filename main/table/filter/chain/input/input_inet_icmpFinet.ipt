@@ -1,5 +1,0 @@
-#
-chain icmpFinet Finet
-rule proto(icmp)  target(icmpFinet) lit(--icmp-type any)
-cmp -A Finet -m icmp -p icmp  --icmp-type any -j icmpFinet
-

@@ -1,6 +1,0 @@
-output - ; input - 
-log-direction=inet
-
-
-proto -
-include input_inet_Finet

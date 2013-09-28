@@ -1,5 +1,0 @@
-  rule target(LOG) $log-options
-  cmp -A INPUT -j LOG --log-prefix "ipt4: NOT from all (default) DROP INPUT" --log-uid --log-tcp-options --log-ip-options --log-level 7
-  rule target(DROP)
-  cmp -A INPUT -j DROP
-

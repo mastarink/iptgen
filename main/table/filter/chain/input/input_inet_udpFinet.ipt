@@ -1,5 +1,0 @@
-#
-chain udpFinet Finet
-rule proto(udp) target(udpFinet)
-cmp -A Finet -m udp  -p udp   -j udpFinet
-
