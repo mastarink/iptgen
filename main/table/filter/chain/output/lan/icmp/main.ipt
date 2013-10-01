@@ -1,0 +1,14 @@
+#
+chain icmp$chsuff $chsuff
+
+rule  target(icmp$chsuff) lit(--icmp-type any) proto(icmp)
+cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
+
+
+chain icmp_oacpt$chsuff icmp$chsuff
+target icmp_oacpt$chsuff
+proto icmp
+
+
+rule target(odrop$chsuff) proto(-)
+cmp -A icmp$chsuff -j odrop$chsuff

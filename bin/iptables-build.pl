@@ -1,5 +1,9 @@
 #!/usr/bin/perl
 # ./bin/iptables-build.pl 1000  | grep -- '\(^\s*[[:digit:]]\+\s*-A\s*F\(lan\|inet\)\|ERROR\)'
+# ./bin/iptables-build.pl 1000  | grep -- '\(^\s*[[:digit:]]\+\s*-A\s*\(tcp\|udp\|icmp\|drop\|accept\|\)\(F\|2\)\(lan\|inet\|local\|lan_vbox\)\|ERROR\)'
+# ./bin/iptables-build.pl 1000  | grep -- '\(^\s*[[:digit:]]\+\s*-A\s*\(\(tcp\|udp\|icmp\|drop\|acpt\|\)\(F\|2\)\(lan\|inet\|local\|lan_vbox\)\|INPUT\|OUTPUT\|FORWARD\|POSTROUTING\)\|ERROR\)'
+# ./bin/iptables-build.pl 1000  | grep --color=yes -- '\(^\s*[[:digit:]]\+\s*-A\s*\(\(tcp\|udp\|icmp\|drop\|acpt\|\(icmp\|tcp\|udp\)_acpt\|\)\(F\|2\)\(lan\|inet\|local\|lan_vbox\)\|INPUT\|OUTPUT\|FORWARD\|POSTROUTING\)\|ERROR\)'
+
 
 use strict;
 use strict 'vars';
@@ -9,6 +13,8 @@ use v5.6.0;
 
 use Net::DNS::Resolver;
 use Net::IP;
+
+my $errorcnt=0;
 
 my $incdir;
 my $workdir;
@@ -22,14 +28,16 @@ my $only_chain;
 my $output_line_comments=1;
 my $output_namecomment=1;
 my $output_empty_lines=1;
+my %resolved;
 my ($last_literal, $last_command);
-my @basic_propset=qw/target output input proto dst src ctstate helper comment/;
+my @basic_propset=qw/chain target output input proto dst src macdst macsrc dpt spt ctstate helper comment/;
 sub build_names;
 
 sub outerr
 {
   my ($code, @msg)=@_;
-  printf save "### ERROR : %03d: %s\n", $code, join(' ', @msg);
+  printf save "### $errorcnt ERROR : %03d: %s\n", $code, join(' ', @msg);
+  $errorcnt++;
 }
 sub outmsg
 {
@@ -84,6 +92,8 @@ sub resolve
     {
       next unless $rr->type eq "A";
       push @result, $rr->address;
+      $resolved{$name}=$rr->address;
+      print STDERR "$name : ".$rr->address."\n";
     }
   }
   return @result;
@@ -172,6 +182,11 @@ sub make_substitution
     $subs=0;
     for (@$command)
     {
+      if (s/\$\{([\w\-]+)\}/$variables{$1}/)
+      {
+        outerr __LINE__, "variable '$1' not defined" unless exists($variables{$1});
+	$subs++;
+      }
       if (s/\$([\w\-]+)\b/$variables{$1}/)
       {
         outerr __LINE__, "variable '$1' not defined" unless exists($variables{$1});
@@ -253,23 +268,27 @@ sub make_command_rule
   if (exists($tables{$current_table}{current_chain}))
   {
     my %opts;
-    my @line=("-A $tables{$current_table}{current_chain}");
+    my @line;
+#    =("-A $tables{$current_table}{current_chain}");
     my %names=(
-		 output=>{name=>'o', order=>11},
-		 input=> {name=>'i', order=>12},
-		 target=>{name=>'j', order=>10000},
-		 src=>{name=>'s', order=>101},
-		 dst=>{name=>'d', order=>103},
-		 spt=>{name=>'-sport', order=>102},
-		 dpt=>{name=>'-dport', order=>104},
-		 spts=>{name=>'-sports', order=>102, module=>{spts=>'multiport'}},
-		 dpts=>{name=>'-dports', order=>104, module=>{dpts=>'multiport'}},
-		 ctstate=>{name=>'-ctstate', order=>1000, module=>{ctstate=>'conntrack'}},
-		 helper=>{name=>'-helper', order=>20, module=>{helper=>'helper'}},
-		 proto=>{name=>'p', order=>15, module=>{tcp=>'tcp',udp=>'udp',icmp=>'icmp'}},
+		 chain=>{name=>'A', order=>0},
 		 comment=>{name=>'-comment', order=>99000, module=>{comment=>'comment'}},
+		 ctstate=>{name=>'-ctstate', order=>1000, module=>{ctstate=>'conntrack'}},
+		 dpt=>{name=>'-dport', order=>104},
+		 dpts=>{name=>'-dports', order=>104, module=>{dpts=>'multiport'}},
+		 dst=>{name=>'d', order=>103},
+		 helper=>{name=>'-helper', order=>20, module=>{helper=>'helper'}},
+		 input=> {name=>'i', order=>12},
 		 lit=>{name=>'', order=>8000},
+		 macdst=>{name=>'-mac-dst?', order=>103, module=>{macdst=>'mac'}},
+		 macsrc=>{name=>'-mac-source', order=>101, module=>{macsrc=>'mac'}},
+		 output=>{name=>'o', order=>11},
+		 proto=>{name=>'p', order=>15, module=>{tcp=>'tcp',udp=>'udp',icmp=>'icmp'}},
+		 spt=>{name=>'-sport', order=>102},
+		 spts=>{name=>'-sports', order=>102, module=>{spts=>'multiport'}},
+		 src=>{name=>'s', order=>101},
 		 tail=>{name=>'', order=>10000},
+		 target=>{name=>'j', order=>10000},
 	      );
     my %process=( src=>'make_address', dst=>'make_address', comment=>'make_comment' );
     my $cmd;
@@ -304,7 +323,17 @@ sub make_command_rule
     }
     for my $node (@basic_propset)
     {
-      $opts{$node}=$tables{$current_table}{$node}	if (!exists($opts{$node}) && exists($tables{$current_table}{$node}));
+      if (!exists($opts{$node}) && exists($tables{$current_table}{$node}))
+      {
+        if ( $node eq 'chain' )
+	{
+	  $opts{$node}=$tables{$current_table}{current_chain};
+	}
+	else
+	{
+	  $opts{$node}=$tables{$current_table}{$node};
+	}
+      }
       delete $opts{$node}	if (exists($opts{$node}) && $opts{$node} eq '-' || length($opts{$node}) == 0);
     }
     
@@ -377,8 +406,13 @@ sub make_command_variable
 {
   my ($var, @command)=@_;
 # variables  
-  $variables{$var}=join(' ', @command);
-# outmsg __LINE__,"defining [$var]=$variables{$var}";
+  my $v=join(' ', @command);
+
+  1 while $v=~s/\$([\w\-]+)/\${$1}/;
+
+
+  $variables{$var}=$v;
+# outmsg __LINE__,"DEFINING [$var]=$variables{$var}";
 }
 sub make_command_cmp
 {
@@ -450,6 +484,8 @@ sub make_command
 	|| $main eq 'input'
 	|| $main eq 'src'
 	|| $main eq 'dst'
+	|| $main eq 'mac-source'
+	|| $main eq 'mac-dst?'
 	|| $main eq 'spt'
 	|| $main eq 'dpt'
 	|| $main eq 'comment'
@@ -652,9 +688,9 @@ sub main
     print while(<tocat>);
     close tocat;
   }
-  print STDERR "\n\n-------------------------\n";
-  printf "check %s\n", system('/sbin/iptables-restore -t /tmp/iptables.build.tmp')==0?'OK':'FAIL';
-  print STDERR "-------------------------\n";
+  print "\n\n#-------------------------\n";
+  printf "# check %s\n", system('/sbin/iptables-restore -t /tmp/iptables.build.tmp')==0?'OK':'FAIL';
+  print "#-------------------------\n";
 }
 
 main @ARGV;

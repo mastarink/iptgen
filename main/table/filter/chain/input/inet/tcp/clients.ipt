@@ -1,13 +1,13 @@
 # clients
 rule ctstate(RELATED,ESTABLISHED)
-cmp -A tcpFinet -i enp2s0 -m tcp -p tcp -d $ipinet -m conntrack --ctstate RELATED,ESTABLISHED -j acptFinet
-# -A tcpFinet $TCP_INET_IN_OPTS -m conntrack --ctstate RELATED,ESTABLISHED -j acptFinet
+cmp -A tcp$chsuff -i enp2s0 -m tcp -p tcp -d $ipinet -m conntrack --ctstate RELATED,ESTABLISHED -j iacpt$chsuff
+# -A tcpFinet $TCP_INET_IN_OPTS -m conntrack --ctstate RELATED,ESTABLISHED -j iacptFinet
 
 rule spts($http_ports)
-cmp -A tcpFinet -i enp2s0 -m tcp -p tcp -m multiport --sports http,https,8080 -d $ipinet -j acptFinet
-# -A tcpFinet $TCP_INET_IN_OPTS -m multiport --sports $HTTP_PORTS           -j acptFinet
+cmp -A tcp$chsuff -i enp2s0 -m tcp -p tcp -m multiport --sports http,https,8080 -d $ipinet -j iacpt$chsuff
+# -A tcpFinet $TCP_INET_IN_OPTS -m multiport --sports $HTTP_PORTS           -j iacptFinet
 
 rule spts($im_ports)
-cmp -A tcpFinet -i enp2s0 -m tcp -p tcp -m multiport --sports xmpp-client,5050,aol -d $ipinet -j acptFinet
-# -A tcpFinet $TCP_INET_IN_OPTS -m multiport --sports xmpp-client,5050,aol -j acptFinet
+cmp -A tcp$chsuff -i enp2s0 -m tcp -p tcp -m multiport --sports xmpp-client,5050,aol -d $ipinet -j iacpt$chsuff
+# -A tcpFinet $TCP_INET_IN_OPTS -m multiport --sports xmpp-client,5050,aol -j iacptFinet
 

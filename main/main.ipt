@@ -6,4 +6,4 @@ defaut_policy=DROP
 wd def
 include log_def if_def ip_port_def
 ;
-wd table ; include mangle/tab_mangle nat/tab_nat filter/tab_filter
+wd table ; include raw/tab mangle/tab nat/tab filter/tab

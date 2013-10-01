@@ -8,16 +8,16 @@ cat << FIL
 :Flan -
 
 # new OK 1
--A Flan -p all -s $LAN_IP_VB --j Flan_vbox
+		-A Flan -p all -s $LAN_IP_VB --j Flan_vbox
 
 ### -A Flan -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_S_MARK from lan " $IPTABLES_LOG_OPTS
 
 # -A Flan  -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_Q_MARK from lan " $IPTABLES_LOG_OPTS
 # new OK 4
--A Flan -m udp -p udp -j udpFlan
--A Flan -m icmp -p icmp  --icmp-type any -j icmpFlan
--A Flan -m tcp -p tcp -j tcpFlan
--A Flan -j dropFlan
+		-A Flan -m udp -p udp -j udpFlan
+		-A Flan -m icmp -p icmp  --icmp-type any -j icmpFlan
+		-A Flan -m tcp -p tcp -j tcpFlan
+		-A Flan -j dropFlan
 
 
 FIL

@@ -1,0 +1,12 @@
+#
+chain udp_iacpt$chsuff
+target iacpt$chsuff
+
+# -A udp_iacptFlan -m udp -p udp -m multiport -s $LAN_IP_RANGE --sports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds -j ACCEPT
+
+# -A udp_iacptFlan -m udp -p udp --dport domain -s $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS -j ACCEPT
+# -A udp_iacptFlan -m udp -p udp --sport domain -d $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS -j ACCEPT
+
+rule target(iacpt$chsuff)
+cmp -A udp_iacpt$chsuff  -j iacpt$chsuff
+# -A udp_iacptFlan  -j iacptFlan

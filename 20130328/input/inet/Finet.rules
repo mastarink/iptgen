@@ -11,11 +11,11 @@ cat << FIL
 # See dropFinet.rules
 
 # new OK 4
--A Finet -m icmp -p icmp  --icmp-type any -j icmpFinet
--A Finet -m tcp  -p tcp   -j tcpFinet
--A Finet -m udp  -p udp   -j udpFinet
+		-A Finet -m icmp -p icmp  --icmp-type any -j icmpFinet
+		-A Finet -m tcp  -p tcp   -j tcpFinet
+		-A Finet -m udp  -p udp   -j udpFinet
 
--A Finet -j dropFinet
+		-A Finet -j dropFinet
 
 
 FIL

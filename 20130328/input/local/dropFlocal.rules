@@ -7,8 +7,10 @@ cat << FIL
 
 :dropFlocal -
 
--A dropFlocal -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK from local " $IPTABLES_LOG_OPTS
-
--A dropFlocal -j DROP
+# new OK 2
+	-A dropFlocal -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK from local " $IPTABLES_LOG_OPTS
+	-A dropFlocal -j DROP
 
 FIL
+
+# vi: ft=iptables

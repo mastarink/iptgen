@@ -1,0 +1,18 @@
+#
+chain icmp$chsuff $chsuff
+
+
+rule  target(icmp$chsuff) lit(--icmp-type any) proto(icmp)
+cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
+
+
+chain icmp$chsuff
+
+rule target(oacpt$chsuff)
+cmp -A icmp$chsuff -j oacpt$chsuff
+# -A icmp2local -i $LO_IFACE -j oacptFlocal
+
+
+rule target(odrop$chsuff)
+cmp -A icmp$chsuff -j odrop$chsuff
+# -A icmp2local -j odrop2local

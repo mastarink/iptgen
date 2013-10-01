@@ -1,11 +1,17 @@
-input $iflocal  ; target Flocal ; rule comment(inputO)
-cmp -A INPUT -i lo -j Flocal -m comment --comment inputO
+log-direction=local
+chsuff=${chpref}$log-direction
+
+
+input $iflocal  ; target $chsuff ; rule comment(inputO)
+cmp -A INPUT -i lo -j $chsuff -m comment --comment inputO
 
 
 output - ; input - 
-log-direction=local
 
 
 proto -
 
-include icmp/main tcp/main udp/main drop/main
+
+
+
+include drop/main accept/main icmp/main tcp/main udp/main

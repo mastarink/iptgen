@@ -1,0 +1,1 @@
+cat /proc/net/netfilter/nf_log

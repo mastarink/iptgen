@@ -1,0 +1,14 @@
+#
+chain tcp$chsuff $chsuff
+
+rule target(tcp$chsuff) proto(tcp)
+cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
+
+chain oacpt$chsuff tcp$chsuff
+
+target oacpt$chsuff
+
+output $ifinet ; dst $ipinet ; proto tcp
+
+
+# include gentoo servers clients

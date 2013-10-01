@@ -1,5 +1,23 @@
 #
-chain udpFlocal Flocal
-rule proto(udp) target(udpFlocal)
-cmp -A Flocal -m udp  -p udp   -j udpFlocal
+chain udp$chsuff $chsuff
 
+rule target(udp$chsuff) proto(udp)
+cmp -A $chsuff -m udp  -p udp   -j udp$chsuff
+
+chain udp$chsuff
+target iacpt$chsuff
+
+rule
+cmp -A udp$chsuff -j iacpt$chsuff
+
+rule
+cmp -A udp$chsuff -j iacpt$chsuff
+# -A udpFlocal -i $LO_IFACE -j iacptFlocal
+
+rule  dpt(domain) proto(udp)
+cmp -A udp$chsuff -m udp -p udp --dport domain -j iacpt$chsuff
+# -A udpFlocal -m udp -p udp --dport domain -j iacptFlocal
+
+rule target(idrop$chsuff)
+cmp -A udp$chsuff -j idrop$chsuff
+# -A udpFlocal -j idropFlocal

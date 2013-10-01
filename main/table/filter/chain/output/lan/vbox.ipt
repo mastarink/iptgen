@@ -1,0 +1,14 @@
+chain ${chpref}lan_vbox ${chpref}lan
+
+rule proto(all) target(${chpref}lan_vbox) src($ipvbox)
+cmp -A ${chpref}lan -p all -s 192.168.71.80/28 -j ${chpref}lan_vbox
+# -A Flan -p all -s 192.168.71.80/28 -j Flan_vbox
+
+  log-message=$log-accept-message (vbox)
+  chain ${chpref}lan_vbox
+  rule target(LOG) $log-options
+  cmp -A ${chpref}lan_vbox -j LOG --log-prefix "ipt4: YES $log-way $log-direction (vbox)" --log-uid --log-tcp-options --log-ip-options --log-level 7
+# -A Flan_vbox -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_YES_MARK vb from lan " $IPTABLES_LOG_OPTS
+  rule target(ACCEPT)
+  cmp -A ${chpref}lan_vbox -j ACCEPT
+# -A Flan_vbox -j ACCEPT

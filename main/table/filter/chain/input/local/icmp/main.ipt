@@ -1,5 +1,18 @@
 #
-chain icmpFlocal Flocal
-rule proto(icmp)  target(icmpFlocal) lit(--icmp-type any)
-cmp -A Flocal -m icmp -p icmp  --icmp-type any -j icmpFlocal
+chain icmp$chsuff $chsuff
 
+
+rule  target(icmp$chsuff) lit(--icmp-type any) proto(icmp)
+cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
+
+
+chain icmp$chsuff
+
+rule target(iacpt$chsuff)
+cmp -A icmp$chsuff -j iacpt$chsuff
+# -A icmpFlocal -i $LO_IFACE -j iacptFlocal
+
+
+rule target(idrop$chsuff)
+cmp -A icmp$chsuff -j idrop$chsuff
+# -A icmpFlocal -j idropFlocal

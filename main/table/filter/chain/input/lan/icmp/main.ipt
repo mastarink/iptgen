@@ -1,5 +1,24 @@
 #
-chain icmpFlan Flan
-rule proto(icmp)  target(icmpFlan) lit(--icmp-type any)
-cmp -A Flan -m icmp -p icmp  --icmp-type any -j icmpFlan
+chain icmp$chsuff $chsuff
 
+rule  target(icmp$chsuff) lit(--icmp-type any) proto(icmp)
+cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
+
+
+chain icmp_iacpt$chsuff icmp$chsuff
+target icmp_iacpt$chsuff
+proto icmp
+
+rule src(mac.lan,mike.lan) lit(--icmp-type 0) comment(icmp_lan_i1)
+# -A icmpFlan -m icmp -p icmp --icmp-type 0 -s $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS -j icmp_iacptFlan -m comment --comment icmp_lan_i1
+
+# to ping from there
+rule src(mac.lan,mike.lan) lit(--icmp-type 8) comment(icmp_lan_i2)
+# -A icmpFlan -m icmp -p icmp --icmp-type 8 -s $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS -j icmp_iacptFlan -m comment --comment icmp_lan_i2
+
+rule src(mac.lan,mike.lan) lit(--icmp-type 3) comment(icmp_lan_i3)
+# -A icmpFlan -m icmp -p icmp --icmp-type 3 -s $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS -j icmp_iacptFlan -m comment --comment icmp_lan_i3
+
+
+rule target(idrop$chsuff) proto(-)
+cmp -A icmp$chsuff -j idrop$chsuff

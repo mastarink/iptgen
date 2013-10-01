@@ -1,14 +1,14 @@
-chain Flan_vbox Flan
+chain ${chpref}lan_vbox $chsuff
 
-rule proto(all) target(Flan_vbox) src($ipvbox)
-cmp -A Flan -p all -s 192.168.71.80/28 -j Flan_vbox
+rule proto(all) target(${chpref}lan_vbox) src($ipvbox)
+cmp -A ${chpref}lan -p all -s 192.168.71.80/28 -j ${chpref}lan_vbox
 # -A Flan -p all -s 192.168.71.80/28 -j Flan_vbox
 
   log-message=$log-accept-message (vbox)
-  chain Flan_vbox
+  chain ${chpref}lan_vbox
   rule target(LOG) $log-options
-  cmp -A Flan_vbox -j LOG --log-prefix "ipt4: YES from lan (vbox)" --log-uid --log-tcp-options --log-ip-options --log-level 7
+  cmp -A ${chpref}lan_vbox -j LOG --log-prefix "ipt4: YES from lan (vbox)" --log-uid --log-tcp-options --log-ip-options --log-level 7
 # -A Flan_vbox -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_YES_MARK vb from lan " $IPTABLES_LOG_OPTS
   rule target(ACCEPT)
-  cmp -A Flan_vbox -j ACCEPT
+  cmp -A ${chpref}lan_vbox -j ACCEPT
 # -A Flan_vbox -j ACCEPT

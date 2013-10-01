@@ -1,4 +1,16 @@
 #
-chain tcpFlocal Flocal
-rule proto(tcp) target(tcpFlocal)
-cmp -A Flocal -m tcp  -p tcp   -j tcpFlocal
+chain tcp$chsuff $chsuff
+
+
+rule target(tcp$chsuff) proto(tcp)
+cmp -A $chsuff -m tcp  -p tcp -j tcp$chsuff
+
+chain tcp$chsuff
+
+rule target(iacpt$chsuff)
+cmp -A tcp$chsuff -j iacpt$chsuff
+# -A tcpFlocal -i $LO_IFACE -j iacptFlocal
+
+rule target(idrop$chsuff)
+cmp -A tcp$chsuff -j idrop$chsuff
+# -A tcpFlocal -j idropFlocal

@@ -1,0 +1,13 @@
+table  begin raw
+  target TRACE ; chain OUTPUT
+  rule proto(udp) dpt(domain)
+  rule proto(udp) spt(domain)
+  chain PREROUTING
+  rule proto(udp) dpt(domain)
+  rule proto(udp) spt(domain)
+table  end raw
+# x_tables: ip_tables: TRACE target: only valid in raw table, not filter
+
+# iptables -t raw -A PREROUTING -p tcp --destination 192.168.0.0/24 --dport 80 -j TRACE
+# iptables -t raw -A OUTPUT -p tcp --destination 192.168.0.0/24 --dport 80 -j TRACE
+

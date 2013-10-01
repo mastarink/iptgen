@@ -1,0 +1,5 @@
+#
+chain oacpt$chsuff
+rule target(ACCEPT)
+# -A oacptFlan -j ACCEPT
+# -A oacptFlan -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_YES_MARK from lan " $IPTABLES_LOG_OPTS

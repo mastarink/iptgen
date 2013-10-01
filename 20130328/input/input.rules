@@ -13,10 +13,10 @@ cat << FIL
 # -A INPUT              -j LOG      --log-prefix "$IPT_PREF_PREF: Q INPUT. " $IPTABLES_LOG_OPTS
 
 # new OK 4
--A INPUT -i $INET_IFACE -j Finet
--A INPUT -i $LAN_IFACE  -j Flan
--A INPUT -i $LO_IFACE   -j Flocal
--A INPUT                -j LOG      --log-prefix "$IPT_PREF_PREF: (default) DROP INPUT. " $IPTABLES_LOG_OPTS
+		-A INPUT -i $INET_IFACE -j Finet
+		-A INPUT -i $LAN_IFACE  -j Flan
+		-A INPUT -i $LO_IFACE   -j Flocal
+		-A INPUT                -j LOG      --log-prefix "$IPT_PREF_PREF: (default) DROP INPUT. " $IPTABLES_LOG_OPTS
 
 
 FIL

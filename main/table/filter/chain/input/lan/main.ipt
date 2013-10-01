@@ -1,8 +1,13 @@
-input $iflan    ; target Flan   ; rule comment(inputA)
-cmp -A INPUT -i enp4s0 -j Flan -m comment --comment inputA
+log-direction=lan
+chsuff=${chpref}$log-direction
+
+
+input $iflan    ; target $chsuff
+rule comment(inputA)
+cmp -A INPUT -i enp4s0 -j $chsuff -m comment --comment inputA
+
 
 output - ; input - 
-log-direction=lan
 
 
 proto -
@@ -10,4 +15,4 @@ proto -
 include vbox
 
 
-include icmp/main tcp/main udp/main drop/main
+include drop/main accept/main icmp/main tcp/main udp/main

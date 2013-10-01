@@ -1,6 +1,6 @@
   log-way=from
-
-  chain Finet Flan Flocal INPUT
+  chpref=F
+  chain ${chpref}inet ${chpref}lan ${chpref}local INPUT
 
   proto -
   wd input
@@ -12,3 +12,4 @@
   log-message=$log-drop-message
 
   include final
+  log-plus=

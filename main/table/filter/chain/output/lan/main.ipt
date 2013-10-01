@@ -1,0 +1,18 @@
+log-direction=lan
+chsuff=${chpref}$log-direction
+
+
+output $iflan    ; target $chsuff
+rule comment(outputA)
+cmp -A OUTPUT -o enp4s0 -j $chsuff -m comment --comment outputA
+
+
+output - ; input - 
+
+
+proto -
+
+include vbox
+
+
+include drop/main accept/main icmp/main tcp/main udp/main

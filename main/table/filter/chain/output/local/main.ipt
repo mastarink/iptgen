@@ -1,0 +1,17 @@
+log-direction=local
+chsuff=${chpref}$log-direction
+
+
+output $iflocal  ; target $chsuff ; rule comment(outputO)
+cmp -A OUTPUT -o lo -j $chsuff -m comment --comment outputO
+
+
+output - ; input - 
+
+
+proto -
+
+
+
+
+include drop/main accept/main icmp/main tcp/main udp/main
