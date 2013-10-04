@@ -1,0 +1,4 @@
+#
+chain acpt$chsuff
+rule target(ACCEPT)
+cmp -A acptWout  -j ACCEPT

@@ -1,0 +1,10 @@
+#
+chain lspt_drop$chsuff
+rule proto(-) dst(-)
+cmp -A lspt_dropFinet -j dropFinet
+#------------------------------------
+chain tcp$chsuff
+rule dst($ipinet) dpts(ms-wbt-server,ms-sql-s,microsoft-ds) target(lspt_drop$chsuff) comment(MS WBT Server and Microsoft-SQL-Server and Microsoft-DS)
+cmp -A tcpFinet -m tcp -p tcp -d 193.222.140.165 -m multiport --dports ms-wbt-server,ms-sql-s,microsoft-ds -j lspt_drop$chsuff -m comment --comment "MS WBT Server and Microsoft-SQL-Server and Microsoft-DS"
+# -A tcpFinet $TCP_INET_IN_OPTS -m multiport --dports ms-wbt-server,ms-sql-s,microsoft-ds -j dropFport_lstd -m comment --comment "MS WBT Server; Microsoft-SQL-Server; Microsoft-DS"
+

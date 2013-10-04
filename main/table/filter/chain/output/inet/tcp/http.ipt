@@ -1,0 +1,28 @@
+chain http$chsuff tcp$chsuff
+
+rule dpts($http-portsx) target(http$chsuff)
+cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports http,https,8080 -j http2inet
+# ------------------------------------
+chain http$chsuff
+
+#-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1067  -j acpt2ihttp -m comment --comment "http gid mastar-browser"
+#-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1024  -j acpt2ihttp -m comment --comment "http gid mastar-http"
+#-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1022  -j acpt2ihttp_nolog -m comment --comment "http gid mastar-firefox"
+
+rule gid-owner($gid-mastar-skype) target(drop$chsuff)
+cmp -A http2inet -m tcp -p tcp -m owner --gid-owner 1068 -j drop2inet
+
+rule gid-owner($gid-squid)
+cmp -A http2inet -m tcp -p tcp -m owner --gid-owner 31 -j acpt2inet
+#-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner   31  -j acpt2ihttp_nolog -m comment --comment "http gid squid"
+
+rule gid-owner($gid-mastar-firefox)
+cmp -A http2inet -m tcp -p tcp -m owner --gid-owner 1022 -j acpt2inet
+
+rule
+cmp -A http2inet -m tcp -p tcp -j acpt2inet
+
+target drop$chsuff
+
+rule
+cmp -A http2inet -m tcp -p tcp -j drop2inet

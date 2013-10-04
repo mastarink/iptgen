@@ -1,10 +1,15 @@
 table  begin raw
-  target TRACE ; chain OUTPUT
-  rule proto(udp) dpt(domain)
-  rule proto(udp) spt(domain)
-  chain PREROUTING
-  rule proto(udp) dpt(domain)
-  rule proto(udp) spt(domain)
+  target TRACE
+  chain OUTPUT
+  rule
+
+# rule proto(icmp) icmp-type(any)
+# rule proto(icmp) icmp-type(any)
+  chain PREROUTING 
+  rule
+
+# rule proto(icmp) icmp-type(any)
+# rule proto(icmp) icmp-type(any)
 table  end raw
 # x_tables: ip_tables: TRACE target: only valid in raw table, not filter
 

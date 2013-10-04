@@ -1,5 +1,0 @@
-#
-chain oacpt$chsuff
-rule target(ACCEPT)
-# -A oacpt2lan -j ACCEPT
-# -A oacpt2lan -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_YES_MARK from inet " $IPTABLES_LOG_OPTS

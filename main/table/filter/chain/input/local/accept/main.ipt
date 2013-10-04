@@ -1,5 +1,0 @@
-#
-chain iacpt$chsuff
-rule target(ACCEPT)
-# -A iacptFlocal -j ACCEPT
-# -A iacptFlocal -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_YES_MARK from local " $IPTABLES_LOG_OPTS

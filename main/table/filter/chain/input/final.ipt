@@ -1,5 +1,5 @@
   rule target(LOG) $log-options
-  cmp -A INPUT -j LOG --log-prefix "ipt4: NOT $log-way all (default) DROP INPUT" --log-uid --log-tcp-options --log-ip-options --log-level 7
+  cmp -A $mainchain -j LOG --log-prefix "ipt4: NOT $log-way all (default) DROP $mainchain" --log-uid $log-xoptions --log-level 7
   rule target(DROP)
   cmp -A INPUT -j DROP
 

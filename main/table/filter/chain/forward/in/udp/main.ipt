@@ -1,0 +1,27 @@
+#
+chain udp$chsuff $chsuff
+
+proto udp
+
+rule target(udp$chsuff)
+cmp -A Win -m udp -p udp -j udpWin
+#--------------------------------------------------
+chain udp$chsuff
+target acpt$chsuff
+
+# ntp / time
+rule dst(mac.lan) spt(ntp) comment(time) src(time.euro.apple.com,time.asia.apple.com,time.apple.com)
+cmp -A udpWin -m udp -p udp -s 17.72.148.52,17.72.148.53,17.82.253.7,17.83.253.7,17.151.16.12,17.151.16.14,17.151.16.20,17.151.16.21,17.151.16.22,17.151.16.23,17.151.16.38,17.171.4.13,17.171.4.14,17.171.4.15,17.171.4.33,17.171.4.34,17.171.4.35,17.171.4.36,17.171.4.37 --sport ntp -d 192.168.71.230 -j acptWin -m comment --comment time
+# -A udpFWinet -m udp -p udp  -s $MAC_LAN_ADDRESS --dport ntp  -j acptFWinet -m comment --comment time
+rule src(mac.lan) dpt(ntp) comment(time)
+rule dst(mac.lan) spt(ntp) comment(time)
+
+# skype
+rule spt($skype-x_port) dst(mac.lan) comment(skype-fw 1i)
+cmp -A udpWin -m udp -p udp --sport $skype-x_port -d 192.168.71.230 -j acptWin -m comment --comment "skype-fw 1i"
+rule spt($skype-port-range) dst(mac.lan) comment(skype-fw 2i)
+cmp -A udpWin -m udp -p udp --sport 40000:49500  -d 192.168.71.230 -j acptWin -m comment --comment "skype-fw 2i"
+rule spts($skype-incoming-ports) dst(mac.lan) comment(skype-fw 3i)
+cmp -A udpWin -m udp -p udp -m multiport --sports 46528,64231 -d 192.168.71.230 -j acptWin -m comment --comment "skype-fw 3i"
+rule dpts($skype-incoming-ports) dst(mac.lan) comment(skype-fw 3i)
+cmp -A udpWin -m udp -p udp -d 192.168.71.230 -m multiport --dports 46528,64231 -j acptWin -m comment --comment "skype-fw 3i"

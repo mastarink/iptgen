@@ -1,0 +1,19 @@
+#
+comment gentoo
+
+rule dpts($http-ports) gid-owner($gid-portage)
+cmp -A tcp2inet -m tcp -p tcp -m multiport --dports http,https -m owner --gid-owner  $gid-portage -j acpt2inet -m comment --comment gentoo
+# -A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS  -m owner --gid-owner 250 -j ask_gentoo -m comment --comment gentoo
+
+rule dpts($http-ports) dst(+http-gentoo)
+cmp -A tcp2inet -m tcp -p tcp -d +http-gentoo -m multiport --dports http,https -j acpt2inet -m comment --comment gentoo
+# -A http2inet $TCP_INET_OUT_OPTS -d $HTTP_GENTOO_LIST -m multiport --dports $HTTP_PORTS -j ask_gentoo -m comment --comment gentoo
+
+rule dst(+rsync-gentoo) dpt(rsync)
+cmp -A tcp2inet -m tcp -p tcp -d +rsync-gentoo --dport rsync -j acpt2inet -m comment --comment gentoo
+# -A tcp2inet $TCP_INET_OUT_OPTS -d $RSYNC_GENTOO_LIST             --dport rsync       -j ask_gentoo -m comment --comment gentoo
+
+rule dst(+git-gentoo) dpt(git)
+cmp -A tcp2inet -m tcp -p tcp -d +git-gentoo --dport git -j acpt2inet -m comment --comment gentoo
+# -A tcp2inet $TCP_INET_OUT_OPTS -d $GIT_GENTOO_LIST               --dport git         -j ask_gentoo -m comment --comment gentoo
+

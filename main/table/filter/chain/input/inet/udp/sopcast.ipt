@@ -1,0 +1,13 @@
+#
+comment &
+chain &_@$chsuff
+
+rule chain(@$chsuff) target(&_@$chsuff)
+cmp -A udpFinet -m udp -p udp -j sopcast_udpFinet -m comment --comment sopcast
+
+chain &_@$chsuff
+
+rule spts(13,3912,3923:3925) dst($ipinet)
+cmp -A sopcast_udpFinet -m udp -p udp -m multiport --sports 13,3912,3923:3925 -d 193.222.140.165 -j udp_acpt$chsuff -m comment --comment sopcast
+# -A udpFinet -d 193.222.140.165/32 -p udp -m udp --sport 3923:3925 -m comment --comment sopcast -j ask_sopcast
+

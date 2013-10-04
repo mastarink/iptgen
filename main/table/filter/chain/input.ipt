@@ -1,6 +1,7 @@
   log-way=from
   chpref=F
-  chain ${chpref}inet ${chpref}lan ${chpref}local INPUT
+  mainchain=INPUT
+  chain ${chpref}inet ${chpref}lan ${chpref}local $mainchain
 
   proto -
   wd input
@@ -8,7 +9,7 @@
   include main
 
   log-direction=all
-  log-plus= (default) DROP INPUT
+  log-plus= (default) DROP $mainchain
   log-message=$log-drop-message
 
   include final

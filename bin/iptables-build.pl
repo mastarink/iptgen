@@ -4,6 +4,11 @@
 # ./bin/iptables-build.pl 1000  | grep -- '\(^\s*[[:digit:]]\+\s*-A\s*\(\(tcp\|udp\|icmp\|drop\|acpt\|\)\(F\|2\)\(lan\|inet\|local\|lan_vbox\)\|INPUT\|OUTPUT\|FORWARD\|POSTROUTING\)\|ERROR\)'
 # ./bin/iptables-build.pl 1000  | grep --color=yes -- '\(^\s*[[:digit:]]\+\s*-A\s*\(\(tcp\|udp\|icmp\|drop\|acpt\|\(icmp\|tcp\|udp\)_acpt\|\)\(F\|2\)\(lan\|inet\|local\|lan_vbox\)\|INPUT\|OUTPUT\|FORWARD\|POSTROUTING\)\|ERROR\)'
 
+#  iptables -F -t raw ; iptables -X -t raw ; iptables -F ; iptables -X ; iptables-restore old.iptables 
+#  iptables -F -t raw ; iptables -X -t raw ; iptables -F ; iptables -X ; iptables-restore /home/mastar/.mas/config/iptables-build/iptables.built
+
+# bin/iptables-build.pl ; cp ./iptables.built ./iptables.built.`datemt` ; diff iptables.built iptables.built.20131004.good >/dev/null || echo -e "\n\n>>>>>>>>> DIFFERENCES DETECTED<<<<<<<<<<<<\n\n\n"
+
 
 use strict;
 use strict 'vars';
@@ -14,9 +19,11 @@ use v5.6.0;
 use Net::DNS::Resolver;
 use Net::IP;
 
-my $errorcnt=0;
+my $current_build_file;
 
 my $incdir;
+my $incname;
+my $thisname;
 my $workdir;
 my $confdir;
 my %control;
@@ -28,16 +35,20 @@ my $only_chain;
 my $output_line_comments=1;
 my $output_namecomment=1;
 my $output_empty_lines=1;
+my $ipt_num=0;
 my %resolved;
-my ($last_literal, $last_command);
-my @basic_propset=qw/chain target output input proto dst src macdst macsrc dpt spt ctstate helper comment/;
+my %off_targets;
+my @errors;
+my ($last_literal, $last_command, $cmp_disabled);
+my @basic_propset=qw/chain target output input proto dst src macdst macsrc dpt spt ctstate uid-owner gid-owner icmp-type helper comment/;
 sub build_names;
 
 sub outerr
 {
   my ($code, @msg)=@_;
-  printf save "### $errorcnt ERROR : %03d: %s\n", $code, join(' ', @msg);
-  $errorcnt++;
+  my $err=[$#errors + 1, $code, join(' ', @msg), $current_build_file];
+  push @errors, $err;
+  printf save "### %3d ERROR : %03d: %s\n###       AT file %120s\n", @$err;
 }
 sub outmsg
 {
@@ -54,6 +65,7 @@ sub outlog
 sub output_literal
 {
   my (@command)=@_;
+  $ipt_num++;
   if (0)
   {
     $last_literal=join(' ', @command);
@@ -69,7 +81,8 @@ sub output_literal
     $prefix=~s/^\s+//;
     $cmd=~s/^\s+//;
     $last_literal=$prefix.$cmd;
-    print save "$last_literal\n" if (($output_active > 0) && (!$only_chain || $tables{$current_table}{current_chain} eq $only_chain));
+#   print save "($ipt_num)";
+    print save $last_literal,"\n" if (($output_active > 0) && (!$only_chain || $tables{$current_table}{current_chain} eq $only_chain));
   }
 }
 sub output_command
@@ -83,19 +96,28 @@ sub resolve
   my ($name)=@_;
   my @result;
   my $res;
+# my $res = Net::DNS::Resolver->new(udp_timeout=>1, tcp_timeout=>1);
   my $res = Net::DNS::Resolver->new;
-  my $query = $res->search($name);
-
-  if ($query)
+# if (!exists($resolved{$name}))
   {
-    foreach my $rr ($query->answer)
+    my $query = $res->search($name);
+    
+  # outmsg __LINE__,"RESOLVE $name";
+    if ($query)
     {
-      next unless $rr->type eq "A";
-      push @result, $rr->address;
-      $resolved{$name}=$rr->address;
-      print STDERR "$name : ".$rr->address."\n";
+      foreach my $rr ($query->answer)
+      {
+	next unless $rr->type eq "A";
+	$resolved{$name}->{$rr->address}=1;
+      }
     }
   }
+  if (exists($resolved{$name}))
+  {
+    @result = keys %{$resolved{$name}};
+#   outmsg __LINE__,"resolve P: $name : ".$resolved{$name}."\n";
+  }
+# outmsg __LINE__,"resolve J: $name : ".join(',', @result)."\n";
   return @result;
 }
 sub make_address_array
@@ -112,7 +134,7 @@ sub make_address_array
       for my $name (@names)
       {
         my $ipfname="$confdir/main/ip/$name.ip";
-#       outmsg __LINE__, "B +$name";
+#       outmsg __LINE__, "IP file: $name";
 	if (-f $ipfname && open ipfile, $ipfname)
 	{
 	  my @iplines=<ipfile>;
@@ -134,7 +156,7 @@ sub make_address_array
     elsif ($address!~/^\d+\.\d+\.\d+\.\d+(\/\d+|)$/)
     { 
       my @ipsr=resolve($address);
-#     outmsg __LINE__, "C ".join(',',@ipsr);
+#     outmsg __LINE__, "resolve C ".join(',',@ipsr);
       if ($#ipsr<0)
       {
 	outerr __LINE__, "wrong address '$address'";
@@ -151,7 +173,9 @@ sub make_address_array
     }
   }
 # outmsg __LINE__, "Z ".join(';',@ips);
-  return @ips;
+  my %ips;
+  $ips{$_}=1 for (@ips);
+  return keys %ips;
 }
 sub ip_compare
 {
@@ -165,14 +189,34 @@ sub make_address
 {
   return join(',', sort( {ip_compare($a, $b)} make_address_array( @_)));
 }
+sub make_address_x
+{
+  my (@a)=map {'+'.$_} map { split /\s*,\s*/ } @_; 
+  return make_address @a;
+}
 sub make_comment
 {
   my (@comments)=map { split /\s+/ } @_;
   my $c;
-  if ($#comments>1) { $c='"'.join(' ',@comments).'"'; }
+  if ($#comments>0) { $c='"'.join(' ',@comments).'"'; }
   else { $c=join(' ',@comments) ;}
 }
 
+sub make_substitutionz
+{
+  my ($command)=@_;
+  my $subs=0;
+  do
+  {
+    $subs=0;
+    for (@$command)
+    {
+      $subs++      if (s/@/$incname/);
+      $subs++      if (s/&/$thisname/);
+    }
+  } while $subs>0;
+# outmsg __LINE__, join(';', @$command);
+}
 sub make_substitution
 {
   my ($command)=@_;
@@ -192,6 +236,8 @@ sub make_substitution
         outerr __LINE__, "variable '$1' not defined" unless exists($variables{$1});
 	$subs++;
       }
+      $subs++      if (s/(\+[\w\-]+)\b/make_address($1)/e);
+      $subs++      if (s/(\+\{([\w\-\,]+)\b\})/make_address_x($2)/e);
     }
   } while $subs>0;
 # outmsg __LINE__, join(';', @$command);
@@ -272,35 +318,37 @@ sub make_command_rule
 #    =("-A $tables{$current_table}{current_chain}");
     my %names=(
 		 chain=>{name=>'A', order=>0},
-		 comment=>{name=>'-comment', order=>99000, module=>{comment=>'comment'}},
-		 ctstate=>{name=>'-ctstate', order=>1000, module=>{ctstate=>'conntrack'}},
-		 dpt=>{name=>'-dport', order=>104},
-		 dpts=>{name=>'-dports', order=>104, module=>{dpts=>'multiport'}},
-		 dst=>{name=>'d', order=>103},
-		 helper=>{name=>'-helper', order=>20, module=>{helper=>'helper'}},
-		 input=> {name=>'i', order=>12},
-		 lit=>{name=>'', order=>8000},
-		 macdst=>{name=>'-mac-dst?', order=>103, module=>{macdst=>'mac'}},
-		 macsrc=>{name=>'-mac-source', order=>101, module=>{macsrc=>'mac'}},
-		 output=>{name=>'o', order=>11},
-		 proto=>{name=>'p', order=>15, module=>{tcp=>'tcp',udp=>'udp',icmp=>'icmp'}},
-		 spt=>{name=>'-sport', order=>102},
-		 spts=>{name=>'-sports', order=>102, module=>{spts=>'multiport'}},
-		 src=>{name=>'s', order=>101},
-		 tail=>{name=>'', order=>10000},
-		 target=>{name=>'j', order=>10000},
+		 comment=>{name=>'-comment', order=>990000, module=>{comment=>'comment'}, process=>'make_comment'},
+		 ctstate=>{name=>'-ctstate', order=>10000, module=>{ctstate=>'conntrack'}},
+		 'uid-owner'=>{name=>'-uid-owner', order=>10000, module=>{'uid-owner'=>'owner'}},
+		 'gid-owner'=>{name=>'-gid-owner', order=>10000, module=>{'gid-owner'=>'owner'}},
+		 'icmp-type'=>{name=>'-icmp-type', order=>170},
+		 dpt=>{name=>'-dport', order=>1040},
+		 dpts=>{name=>'-dports', order=>1040, module=>{dpts=>'multiport'}},
+		 dst=>{name=>'d', order=>1030, process=>'make_address'},
+		 helper=>{name=>'-helper', order=>200, module=>{helper=>'helper'}},
+		 input=> {name=>'i', order=>110},
+		 lit=>{name=>'', order=>80000},
+		 macdst=>{name=>'-mac-dst?', order=>1030, module=>{macdst=>'mac'}},
+		 macsrc=>{name=>'-mac-source', order=>1010, module=>{macsrc=>'mac'}},
+		 output=>{name=>'o', order=>120},
+		 proto=>{name=>'p', order=>150, module=>{tcp=>'tcp',udp=>'udp',icmp=>'icmp'}},
+		 spt=>{name=>'-sport', order=>1020},
+		 spts=>{name=>'-sports', order=>1020, module=>{spts=>'multiport'}},
+		 src=>{name=>'s', order=>1010, process=>'make_address'},
+		 tail=>{name=>'', order=>100000},
+		 target=>{name=>'j', order=>100000},
 	      );
-    my %process=( src=>'make_address', dst=>'make_address', comment=>'make_comment' );
     my $cmd;
     while( $cmd = shift(@command) )
     {
       my $name;
       my $opt;
+      # do parenthesis
       while(@command && $cmd =~/^\s*(\S+)\s*\([^\)]*$/)
       {
         $cmd="$cmd ".shift(@command);
       }
-#     outmsg __LINE__, $cmd;
       if ($cmd =~/^\s*(\S+)\s*\(\s*([^\)]*)\s*\)\s*$/ && exists($names{$1}->{name}))
       {
 	$name=$1;
@@ -314,7 +362,7 @@ sub make_command_rule
       }
       if ($opts{$name})
       {
-	$opts{$name}="$opts{$name} $opt";
+	$opts{$name}=$opts{$name}.' '.$opt;
       }
       else
       {
@@ -336,24 +384,29 @@ sub make_command_rule
       }
       delete $opts{$node}	if (exists($opts{$node}) && $opts{$node} eq '-' || length($opts{$node}) == 0);
     }
-    
+    my %linemodules;
     for my $name (sort({ $names{$a}->{order} <=> $names{$b}->{order} } keys(%opts)))
     {
-      if (exists $process{$name} )
+      if (exists $names{$name}->{process} )
       {
-	$opts{$name}=eval "$process{$name}('$opts{$name}')"
+        my $process=$names{$name}->{process};
+ 	$opts{$name}=eval "$process('$opts{$name}')"
       }
       {
         my $line;
-        if (           exists(    $names{$name}->{module}->{$opts{$name}})      )
+        if (           exists     $names{$name}->{module}->{$opts{$name}}       )
         {
 	  my $val=$names{$name}->{module}->{$opts{$name}};
           $line="-m $val ";
         }
-	elsif (        exists(    $names{$name}->{module}->{$name})   )
+	elsif (        exists     $names{$name}->{module}->{$name}   )
 	{
 	  my $val=$names{$name}->{module}->{$name};
-          $line="-m $val ";
+	  if (!exists($linemodules{$val}) )
+	  {
+	    $linemodules{$val}=$name;
+            $line="-m $val ";
+	  }
 	}
         if ($name eq 'tail' || $name eq 'lit')
 	{
@@ -366,11 +419,16 @@ sub make_command_rule
 	}
       }
     }
-    output_command '', @line;
+    $cmp_disabled=1;
+    if (!exists $opts{target} || !exists($off_targets{$opts{target}}) )
+    {
+      output_command '', @line;
+      undef $cmp_disabled;
+    }
   }
   else
   {
-    outerr( __LINE__, "unknown chain '".$tables{$current_table}{chain}."'");
+    outerr __LINE__, "unknown chain '".$tables{$current_table}{chain}."'";
   }
 }
 sub make_switch
@@ -420,63 +478,78 @@ sub make_command_cmp
   my $this_command=join(' ', @command);
 # outmsg __LINE__, $last_command;
 # outmsg __LINE__, join(' ', @command);
-  if ("$last_command" ne "$this_command")
+  if (!$cmp_disabled && "$last_command" ne "$this_command")
   {
-    outerr __LINE__, '-- cmp FAIL: --L('.length($last_command).'/'.length($this_command).')';
-    outerr __LINE__, "'$last_command'";
-    outerr __LINE__, "'$this_command'";
+    outerr __LINE__, "-- cmp FAIL: --L(".length($last_command).'/'.length($this_command).")", "\n       $last_command", "\n       $this_command";
+  }
+  undef $last_command;
+  undef $cmp_disabled;
+}
+sub make_command_target_ctl
+{
+  my (@command)=@_;
+  my $subcmd=shift @command;
+  if ($subcmd eq 'off')
+  {
+#   outerr __LINE__, 'TARGET OFF: '.join(' ', @command);
+    $off_targets{$_}=1 for (@command);
   }
 }
-
-sub make_command
+sub make_command_array
 {
   my ($command)=@_;
-  my @command;
   my $main;
-  @command=split /\s+/, $command;
-  $main=shift @command;
+  $main=shift @$command;
   if ($main eq 'table')
   {
-    make_substitution \@command;
-    make_command_table @command;
+    make_substitution $command;
+    make_command_table @$command;
   }
   elsif ($main eq 'policy')
   {
-    make_substitution \@command;
-    make_command_policy @command;
+    make_substitution $command;
+    make_command_policy @$command;
   }
   elsif ($main eq 'chain')
   {
-    make_substitution \@command;
-    make_command_chain @command;
+    make_substitution $command;
+    make_command_chain @$command;
   }
   elsif ($main eq 'rule')
   {
-    make_substitution \@command;
-    make_command_rule @command;
+    make_substitution $command;
+    make_command_rule @$command;
   }
   elsif ($main eq 'cmp')
   {
-    make_substitution \@command;
-    make_command_cmp @command;
+    make_substitution $command;
+    make_command_cmp @$command;
   }
-  elsif ($main eq 'off' || $main eq 'on') { make_command_onoff $main, @command; }
-  elsif ($main eq 'l-comment-off') { make_command_lcomment 'off', @command; }
-  elsif ($main eq 'l-comment-on')  { make_command_lcomment 'on', @command; }
-  elsif ($main eq 'l-comment') { make_command_lcomment @command; }
-  elsif ($main eq 'name-comment-off') { make_command_namecomment 'off', @command; }
-  elsif ($main eq 'name-comment-on')  { make_command_namecomment 'on', @command; }
-  elsif ($main eq 'name-comment') { make_command_namecomment @command; }
-  elsif ($main eq 'empty-lines') { make_command_emptylines @command; }
+  elsif ($main eq 'target-ctl')
+  {
+    make_substitution $command;
+    make_command_target_ctl @$command;
+  }
+  elsif ($main eq 'off' || $main eq 'on') { make_command_onoff $main, @$command; }
+  elsif ($main eq 'l-comment-off') { make_command_lcomment 'off', @$command; }
+  elsif ($main eq 'l-comment-on')  { make_command_lcomment 'on', @$command; }
+  elsif ($main eq 'l-comment') { make_command_lcomment @$command; }
+  elsif ($main eq 'name-comment-off') { make_command_namecomment 'off', @$command; }
+  elsif ($main eq 'name-comment-on')  { make_command_namecomment 'on', @$command; }
+  elsif ($main eq 'name-comment') { make_command_namecomment @$command; }
+  elsif ($main eq 'empty-lines') { make_command_emptylines @$command; }
   elsif ($main =~/^([\w-]+)=(.*$)/)
-  { make_command_variable $1, ($2,@command); }
+  { 
+    make_command_variable $1, ($2,@$command);
+  }
   elsif ($main eq 'include')
   {
-    build_names @command;
+    build_names @$command;
   }
   elsif ($main eq 'wd' )
   {
-    $workdir=shift @command;
+    $workdir=shift @$command;
+#   outmsg __LINE__, ">>>>>>>>>>>>>>> [$workdir]";
   }
   elsif ($main eq 'target' 
   	|| $main eq 'proto'
@@ -488,17 +561,49 @@ sub make_command
 	|| $main eq 'mac-dst?'
 	|| $main eq 'spt'
 	|| $main eq 'dpt'
+	|| $main eq 'icmp-type'
+	|| $main eq 'uid-owner'
+	|| $main eq 'gid-owner'
 	|| $main eq 'comment'
 	)
   {
-    make_substitution \@command;
+    make_substitution $command;
 #   $tables{$current_table}{$main}=$command[0];
-    $tables{$current_table}{$main}=join(' ', @command);
+    my $v=join(' ', @$command);
+    $tables{$current_table}{$main}=$v;
   }
   else
   {
-    outerr  __LINE__, "unknown command '$main(".join(' ', @command).")'";
+    outerr  __LINE__, "unknown command '$main(".join(' ', @$command).")'";
   }
+}
+sub make_shortcuts
+{
+  my ($command)=@_;
+  my $name=shift @$command;
+  if ($name eq 'allow')
+  {
+    my $dst=shift @$command;
+    my $dpt=shift @$command;
+# allow media.brg.ua 8014 radio 8014
+# rule dst(media.brg.ua) dpt(8014) comment(radio 8014)
+    @$command=('rule', 'dst('.$dst.')', 'dpt('.$dpt.')', 'comment('.join(' ', @$command).')');
+    
+#   die("$name -- ".join(';', @$command)); 
+  }
+  else
+  {
+    unshift @$command, $name;
+  }
+}
+sub make_command
+{
+  my ($command)=@_;
+  my @command;
+  @command=split /\s+/, $command;
+  make_substitutionz \@command;
+  make_shortcuts \@command;
+  make_command_array \@command;
 }
 
 sub make_commands
@@ -569,14 +674,20 @@ sub build_iptables
 {
   my ($fname)=@_;
   $incdir="$confdir/main" if (!$incdir);
-  my $conffile="$incdir/$workdir/$fname.ipt";
+  my $conffile=$incdir;
+  $conffile.="/$workdir" if $workdir;
+  $conffile.="/$fname.ipt";
+  $current_build_file=$conffile;
   $workdir='';
   if ( -f "$conffile" )
   {
-    if ($conffile=~/^(.*)\/([^\/]+)$/)
-    {
-      $incdir=$1;
-    }
+    if ($conffile=~/^(.*?)\/+([^\/]+)\.ipt$/)
+    { $incdir=$1; $thisname=$2; }
+    if ($incdir=~/^(.*?)\/+([^\/]+)$/)
+    {  $incname=$2;  }
+    else
+    { $incname=$incdir; }
+#   outmsg __LINE__, "$incdir -- $workdir -- $incname -- $thisname";
 ##  outmsg __LINE__, "$incdir / $workdir @ $conffile";
 ##  outmsg __LINE__, "$conffile exists";
     outlog __LINE__, "$conffile exists";
@@ -662,10 +773,15 @@ sub build_names
 sub main
 {
   my (@args)=@_;
+  local *loadip;
+  local *saveip;
   local *save;
   local *tocat;
-  unlink '/tmp/iptables.build.tmp';
-  if ( open save, '>', '/tmp/iptables.build.tmp' )
+  make_confdir;
+  my $save_file="$confdir/iptables.built";
+  unlink "$save_file";
+  print STDERR "$save_file\n";
+  if ( open save, '>', $save_file )
   {
     for (@args)
     {
@@ -674,23 +790,78 @@ sub main
       else
       { $only_chain=$_; }
     }
-
-    make_confdir;
+    {
+      if (-r "$confdir/iptables.ip")
+      {
+	if ( open loadip, '<', "$confdir/iptables.ip" )
+	{
+	  while(<loadip>)
+	  {
+	    my @a;
+	    my $name;
+	    my @iplist;
+	    if (/^(.*):(.*)$/)
+	    {
+	      my $iplist;
+	      $name=$1;
+	      $iplist=$2;
+	      @iplist=split /\s*,\s*/, $iplist;
+	      for my $ip (@iplist)
+	      {
+	        $resolved{$name}->{$ip}=1;
+	      }
+	    }
+	  }
+	  close loadip;
+	}
+      }
+    }
+    {
+      if ( open saveip, '>', "$confdir/iptables0.ip" )
+      {
+	for my $name (sort keys %resolved)
+	{
+	  print saveip $name,':', join(',', keys %{$resolved{$name}}),"\n";
+	}
+	close saveip;
+      }
+    }
     build_names 'main';
+    {
+      if ( open saveip, '>', "$confdir/iptables.ip" )
+      {
+	for my $name (sort keys %resolved)
+	{
+	  print saveip $name,':', join(',',keys %{$resolved{$name}}),"\n";
+	}
+	close saveip;
+      }
+    }
     output_literal '';
     output_literal '';
     output_literal '# vi: ft=iptables';
     close save;
   }
-# if ( open tocat, '<', '/tmp/iptables.build.tmp' )
-  if ( open tocat, 'cat -n /tmp/iptables.build.tmp |' )
+# if ( open tocat, '<', $save_file )
+  if ( open tocat, "cat -n $save_file |" )
   {
     print while(<tocat>);
     close tocat;
   }
-  print "\n\n#-------------------------\n";
-  printf "# check %s\n", system('/sbin/iptables-restore -t /tmp/iptables.build.tmp')==0?'OK':'FAIL';
-  print "#-------------------------\n";
+  {
+    print STDERR "\n\n#-------------------------\n";
+    if ($#errors >= 0)
+    {
+      print STDERR "\n\n@@ >>>>>>>>> ".($#errors+1)." ERRORS DETECTED <<<<<<<<<<<<\n\n";
+      for my $err (@errors)
+      { printf STDERR "@@ --- (%3d) ERROR : %03d: %s\n\n@@ >> AT file %-s\n\n", @$err; }
+    }
+    elsif (system('diff iptables.built iptables.good >built.diff'))
+    { print STDERR "\n\n@@ >>>>>>>>> DIFFERENCES from iptables.good DETECTED <<<<<<<<<<<<\n\n"; }
+    else
+    { printf STDERR "\n\n@@ >>>>>>>> CHECK %s <<<<<<<<<<<<\n", system("/sbin/iptables-restore -t $save_file") == 0?'OK':'FAIL'; }
+    print STDERR "#-------------------------\n";
+  }
 }
 
 main @ARGV;

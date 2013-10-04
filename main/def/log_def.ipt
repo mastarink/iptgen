@@ -7,5 +7,6 @@ log-accept-msg=$log-yes-mark $log-way $log-direction$log-plus
 log-accept-message=$log-ipt-pref: $log-accept-msg
 log-yes-mark=YES
 log-not-mark=NOT
+log-xoptions=--log-tcp-options --log-ip-options --log-tcp-sequence --log-macdecode
 ;
-log-options=--log-prefix "$log-message" --log-uid --log-tcp-options --log-ip-options --log-level $log-level
+log-options=--log-prefix "$log-message" --log-uid $log-xoptions --log-level $log-level

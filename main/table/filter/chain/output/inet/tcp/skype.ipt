@@ -1,0 +1,9 @@
+#skype
+
+rule dpt($skype-port-range) comment(skype 1o)
+cmp -A tcp2inet -m tcp -p tcp --dport 40000:49500  -j acpt2inet -m comment --comment "skype 1o"
+
+rule spts($skype-incoming-ports) src($ipinet) comment(skype 2o)
+cmp -A tcp2inet -m tcp -p tcp -s 193.222.140.165 -m multiport --sports 46528,64231 -j acpt2inet -m comment --comment "skype 2o"
+
+

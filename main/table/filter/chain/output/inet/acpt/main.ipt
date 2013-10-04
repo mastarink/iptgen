@@ -1,0 +1,6 @@
+#
+chain acpt$chsuff
+rule target(ACCEPT)
+cmp -A acpt2inet -j ACCEPT
+# -A acpt2lan -j ACCEPT
+# -A acpt2lan -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_YES_MARK from inet " $IPTABLES_LOG_OPTS

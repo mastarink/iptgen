@@ -1,0 +1,6 @@
+#
+chain acpt$chsuff
+rule target(ACCEPT)
+cmp -A acpt2local -j ACCEPT
+# -A acpt2local -j ACCEPT
+# -A acpt2local -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_YES_MARK $log-way $log-direction " $IPTABLES_LOG_OPTS

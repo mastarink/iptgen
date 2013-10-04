@@ -1,24 +1,30 @@
 #
 chain icmp$chsuff $chsuff
+proto icmp
 
-rule  target(icmp$chsuff) lit(--icmp-type any) proto(icmp)
+rule  target(icmp$chsuff) icmp-type(any)
 cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
 
 
-chain icmp_iacpt$chsuff icmp$chsuff
-target icmp_iacpt$chsuff
-proto icmp
+chain icmp_acpt$chsuff icmp$chsuff
+target icmp_acpt$chsuff
 
-rule src(mac.lan,mike.lan) lit(--icmp-type 0) comment(icmp_lan_i1)
-# -A icmpFlan -m icmp -p icmp --icmp-type 0 -s $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS -j icmp_iacptFlan -m comment --comment icmp_lan_i1
+rule src($iplan-icmp) icmp-type(0) comment(icmp_lan_i1)
+cmp -A icmpFlan -m icmp -p icmp --icmp-type 0 -s 10.0.2.0/24,192.168.71.66,192.168.71.230 -j icmp_acptFlan -m comment --comment icmp_lan_i1
+#   -A icmpFlan -m icmp -p icmp --icmp-type 0 -s $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS       -j icmp_acptFlan -m comment --comment icmp_lan_i1
 
 # to ping from there
-rule src(mac.lan,mike.lan) lit(--icmp-type 8) comment(icmp_lan_i2)
-# -A icmpFlan -m icmp -p icmp --icmp-type 8 -s $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS -j icmp_iacptFlan -m comment --comment icmp_lan_i2
+rule src($iplan-icmp) icmp-type(8) comment(icmp_lan_i2)
+cmp -A icmpFlan -m icmp -p icmp --icmp-type 8 -s 10.0.2.0/24,192.168.71.66,192.168.71.230 -j icmp_acptFlan -m comment --comment icmp_lan_i2
+#   -A icmpFlan -m icmp -p icmp --icmp-type 8 -s $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS       -j icmp_acptFlan -m comment --comment icmp_lan_i2
 
-rule src(mac.lan,mike.lan) lit(--icmp-type 3) comment(icmp_lan_i3)
-# -A icmpFlan -m icmp -p icmp --icmp-type 3 -s $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS -j icmp_iacptFlan -m comment --comment icmp_lan_i3
+rule src($iplan-icmp) icmp-type(3) comment(icmp_lan_i3)
+cmp -A icmpFlan -m icmp -p icmp --icmp-type 3 -s 10.0.2.0/24,192.168.71.66,192.168.71.230 -j icmp_acptFlan -m comment --comment icmp_lan_i3
+#   -A icmpFlan -m icmp -p icmp --icmp-type 3 -s $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS       -j icmp_acptFlan -m comment --comment icmp_lan_i3
 
 
-rule target(idrop$chsuff) proto(-)
-cmp -A icmp$chsuff -j idrop$chsuff
+chain drop$chsuff icmp$chsuff
+rule target(drop$chsuff) proto(-)
+cmp -A icmp$chsuff -j drop$chsuff
+
+include acpt

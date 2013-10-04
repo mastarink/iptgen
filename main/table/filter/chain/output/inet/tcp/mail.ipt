@@ -1,0 +1,7 @@
+# rule gid-owner($gid-mastar-mail) dpts($pop3_ports) dst(+pop3_servers) comment(pop mail client)
+# cmp -A tcp2inet -m tcp  -p tcp -d 74.125.0.0/16,91.203.51.253,173.194.0.0/16,173.194.70.108,173.194.70.109,216.239.32.0/19 -m multiport --dports pop3,pop3s -m owner --gid-owner 1074 -j acpt2inet -m comment --comment "pop mail client"
+
+rule dpts($pop3_ports) dst(+pop3_servers) comment(pop mail client)
+cmp -A tcp2inet -m tcp  -p tcp -d 74.125.0.0/16,91.203.51.253,173.194.0.0/16,173.194.70.108,173.194.70.109,216.239.32.0/19 -m multiport --dports pop3,pop3s -j acpt2inet -m comment --comment "pop mail client"
+# -A tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports pop3,pop3s -d $POP_SERVERS -j acpt2inet -m comment --comment "pop mail client"
+

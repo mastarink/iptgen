@@ -1,0 +1,13 @@
+#
+chain udp_acpt$chsuff
+target acpt$chsuff
+
+
+
+
+
+
+rule target(acpt$chsuff)
+cmp -A udp_acpt$chsuff  -j acpt$chsuff
+# -A udp_acpt2inet  -j acpt2inet
+

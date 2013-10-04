@@ -15,3 +15,5 @@ cat << FIL
 
 
 FIL
+
+# vi: ft=iptables

@@ -1,14 +1,39 @@
 #
-chain tcp$chsuff $chsuff
+chain drop$chsuff tcp$chsuff $chsuff
+proto tcp
 
-rule target(tcp$chsuff) proto(tcp)
+rule target(tcp$chsuff)
 cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
 
-chain oacpt$chsuff tcp$chsuff
+target acpt$chsuff
 
-target oacpt$chsuff
+chain tcp$chsuff 
+rule dpts(xmpp-client,aol) comment(IM client)
+cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports xmpp-client,aol -j acpt2inet -m comment --comment "IM client"
+# rule gid-owner($gid-mastar-xmpp) dpts(xmpp-client,aol) comment(IM client)
+# cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports xmpp-client,aol -m owner --gid-owner 1073 -j acpt2inet -m comment --comment "IM client"
+# -A tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports xmpp-client,5050,aol  -j acpt2inet_nolog -m comment --comment "IM client"
 
-output $ifinet ; dst $ipinet ; proto tcp
+rule dpts(nicname,rwhois) comment(WHOIS client)
+cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports nicname,rwhois -j acpt2inet -m comment --comment "WHOIS client"
+# -A tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports nicname,rwhois        -j acpt2inet -m comment --comment "WHOIS client"
 
+include skype
 
-# include gentoo servers clients
+rule dst(+nmap) comment(nmap all tcp)
+cmp -A tcp2inet -m tcp -p tcp -d +nmap -j acpt2inet -m comment --comment "nmap all tcp"
+
+# radio
+# nrcu.gov.ua:8000
+# rule dst(+radio8000) dpt(8000) comment(radio 8000)
+allow +radio8000 8000 radio 8000
+cmp -A tcp2inet -m tcp -p tcp -d +radio8000 --dport 8000 -j acpt2inet -m comment --comment "radio 8000"
+allow media.brg.ua 8014 radio 8014
+cmp -A tcp2inet -m tcp -p tcp -d 217.20.164.163 --dport 8014 -j acpt2inet -m comment --comment "radio 8014"
+
+include mail http gentoo
+
+target drop$chsuff
+rule
+
+include acpt drop

@@ -8,11 +8,12 @@ cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
 
 chain icmp$chsuff
 
-rule target(iacpt$chsuff)
-cmp -A icmp$chsuff -j iacpt$chsuff
-# -A icmpFlocal -i $LO_IFACE -j iacptFlocal
+rule target(acpt$chsuff)
+cmp -A icmp$chsuff -j acpt$chsuff
+# -A icmpFlocal -i $LO_IFACE -j acptFlocal
 
 
-rule target(idrop$chsuff)
-cmp -A icmp$chsuff -j idrop$chsuff
-# -A icmpFlocal -j idropFlocal
+chain drop$chsuff icmp$chsuff
+rule target(drop$chsuff)
+cmp -A icmp$chsuff -j drop$chsuff
+# -A icmpFlocal -j dropFlocal

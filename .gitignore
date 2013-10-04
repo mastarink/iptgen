@@ -1,2 +1,6 @@
 *.tmp
 trace*.txt
+iptables.built*
+*.vim
+save-*
+built.diff

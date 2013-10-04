@@ -1,0 +1,7 @@
+#
+chain tcp_acpt$chsuff
+target acpt$chsuff
+
+rule target(acpt$chsuff) proto(-)
+cmp -A tcp_acpt$chsuff  -j acpt$chsuff
+# -A tcp_acptFlan  -j acptFlan

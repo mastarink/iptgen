@@ -1,6 +1,16 @@
-off
+  log-way=from
+  chpref=W
+  mainchain=FORWARD
+  chain ${chpref}in ${chpref}out $mainchain
+
   proto -
   wd forward
 
-  include fw_input fw_output
-on
+  include main
+
+  log-direction=all
+  log-plus= (default) DROP $mainchain
+  log-message=$log-drop-message
+
+  include final
+  log-plus=

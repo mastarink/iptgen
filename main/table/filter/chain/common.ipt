@@ -1,0 +1,17 @@
+#
+  log-way=thru
+  chpref=C
+  mainchain=COMMON
+  chain ${chpref}inet ${chpref}lan ${chpref}local $mainchain
+
+  proto -
+  wd common
+  
+  include main
+
+  log-direction=all
+  log-plus= (default) DROP $mainchain
+  log-message=$log-drop-message
+
+  include final
+  log-plus=

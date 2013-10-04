@@ -1,0 +1,7 @@
+#
+# RTMP
+rule target(ask_rtmp) comment(rtmp client TVI) spt($rtmp_port)
+cmp -A tcp$chsuff -m tcp -p tcp --sport $rtmp_port -d $ipinet -j ask_rtmp -m comment --comment "rtmp client TVI"
+# -A tcpFinet $TCP_INET_IN_OPTS -s $TVI_ADDRESS_LIST --sport $RTMP_PORT -j ask_rtmp -m comment --comment "rtmp client TVI"
+
+

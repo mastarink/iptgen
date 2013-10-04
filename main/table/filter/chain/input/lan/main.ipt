@@ -1,18 +1,20 @@
-log-direction=lan
-chsuff=${chpref}$log-direction
+#
+log-direction=@
 
+input $if@
+target $chsuff
 
-input $iflan    ; target $chsuff
 rule comment(inputA)
 cmp -A INPUT -i enp4s0 -j $chsuff -m comment --comment inputA
-
-
+#----------------------------------------
 output - ; input - 
+include acpt/main icmp/main tcp/main udp/main igmp/main drop/main vbox
+
+chain drop$chsuff $chsuff
+target drop$chsuff
+
+rule
+cmp -A Flan -j dropFlan
 
 
 proto -
-
-include vbox
-
-
-include drop/main accept/main icmp/main tcp/main udp/main

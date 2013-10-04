@@ -1,0 +1,15 @@
+#
+comment &
+chain &_@$chsuff
+
+rule chain(@$chsuff) target(&_@$chsuff)  icmp-type(any)
+cmp -A icmpFinet -m icmp -p icmp --icmp-type any -j sopcast_icmpFinet -m comment --comment sopcast
+#--------------------------------------------------
+
+#sopcast
+rule  comment(ping3 me sopcast etc.) icmp-type(3)
+cmp -A sopcast_icmpFinet -m icmp -p icmp --icmp-type 3 -j acptFinet -m comment --comment "ping3 me sopcast etc."
+rule  comment(ping11 me sopcast etc.) icmp-type(11)
+cmp -A sopcast_icmpFinet -m icmp -p icmp --icmp-type 11 -j acptFinet -m comment --comment "ping11 me sopcast etc."
+# chain icmp$chsuff 
+

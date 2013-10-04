@@ -1,17 +1,17 @@
 #
-  chain odrop$chsuff $chsuff
+  chain drop$chsuff $chsuff
   
-  rule target(odrop$chsuff)
-  cmp -A $chsuff -j odrop$chsuff
+  rule target(drop$chsuff)
+  cmp -A $chsuff -j drop$chsuff
 
-  chain odrop$chsuff
+  chain drop$chsuff
 
 # include listed
 
   log-message=$log-drop-message
   rule target(LOG) $log-options
-  cmp -A odrop$chsuff -j LOG --log-prefix "ipt4: NOT $log-way $log-direction" --log-uid --log-tcp-options --log-ip-options --log-level 7
-  # -A odrop$chsuff -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK $log-way $log-direction " $IPTABLES_LOG_OPTS
+  cmp -A drop$chsuff -j LOG --log-prefix "ipt4: NOT $log-way $log-direction" --log-uid $log-xoptions --log-level 7
+  # -A drop$chsuff -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK $log-way $log-direction " $IPTABLES_LOG_OPTS
 
   target DROP ; rule
-  cmp -A odrop$chsuff -j DROP
+  cmp -A drop$chsuff -j DROP

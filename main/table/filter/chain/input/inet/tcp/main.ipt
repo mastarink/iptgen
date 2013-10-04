@@ -1,19 +1,19 @@
 #
-chain tcp$chsuff $chsuff
+chain @$chsuff $chsuff
+proto @
 
-rule target(tcp$chsuff) proto(tcp)
+rule target(@$chsuff)
 cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
+# ------------------------------------------
+chain drop$chsuff acpt$chsuff ask_rtmp @$chsuff
+dst $ipinet
 
-chain iacpt$chsuff tcp$chsuff
+target acpt$chsuff
 
-target iacpt$chsuff
+include rtmp gentoo servers clients skype
 
-input $ifinet ; dst $ipinet ; proto tcp
+target drop$chsuff
+include listed_ports
 
-chain ask_rtmp tcp$chsuff
-# RTMP
-rule target(ask_rtmp) comment(rtmp client TVI) spt($rtmp_port)
-cmp -A tcp$chsuff -i enp2s0 -m tcp -p tcp --sport $rtmp_port -d $ipinet -j ask_rtmp -m comment --comment "rtmp client TVI"
-# -A tcpFinet $TCP_INET_IN_OPTS -s $TVI_ADDRESS_LIST --sport $RTMP_PORT -j ask_rtmp -m comment --comment "rtmp client TVI"
-
-include gentoo servers clients
+rule proto(-) dst(-)
+cmp -A tcpFinet -j dropFinet

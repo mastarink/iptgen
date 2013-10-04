@@ -1,0 +1,15 @@
+#
+chain sop_udp$chsuff udp$chsuff
+
+rule target(sop_udp$chsuff)
+cmp -A udp2inet -m udp -p udp -j sop_udp2inet
+
+# sopcast
+
+chain sop_udp$chsuff
+rule dpts(13,3912,3923:3925) comment(sopcast) src($ipinet) gid-owner($gid-mastar-sopcast)
+cmp -A sop_udp2inet -m udp -p udp -s 193.222.140.165 -m multiport --dports 13,3912,3923:3925 -m owner --gid-owner 1081 -j udp_acpt$chsuff -m comment --comment sopcast
+# -A udp2inet -s 193.222.140.165/32 -p udp -m udp --dport 3923:3925 -m comment --comment sopcast -j ask_sopcast
+rule spt(10000:50000) comment(sopcast) src($ipinet) gid-owner($gid-mastar-sopcast)
+cmp -A sop_udp2inet -m udp -p udp -s 193.222.140.165 --sport 10000:50000 -m owner --gid-owner 1081 -j udp_acpt$chsuff -m comment --comment sopcast
+

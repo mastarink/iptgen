@@ -2,6 +2,8 @@ table  begin filter
   policy INPUT OUTPUT FORWARD $defaut_policy
   target DROP
   
-  wd chain ; include output input forward
+  wd chain
+  include output input forward
+# include common
 
 table  end filter

@@ -1,28 +1,46 @@
 #
-chain udp_oacpt$chsuff udp$chsuff $chsuff
+chain udp_acpt$chsuff udp$chsuff $chsuff
 
 include acpt
 
-rule target(udp$chsuff) proto(udp)
+proto udp
+rule target(udp$chsuff)
 cmp -A $chsuff -m udp  -p udp   -j udp$chsuff
 
-proto udp
 # -----------------------------------------------
 chain udp$chsuff
-target udp_oacpt$chsuff
+target udp_acpt$chsuff
+
 rule  dpt(domain)
-cmp -A udp$chsuff -m udp -p udp --dport domain -j udp_oacpt$chsuff
-# -A udp2lan -m udp -p udp --dport domain -j udp_oacpt2lan
+cmp -A udp$chsuff -m udp -p udp --dport domain -j udp_acpt$chsuff
+# -A udp2lan -m udp -p udp --dport domain -j udp_acpt2lan
+rule  spt(domain)
+cmp -A udp$chsuff -m udp -p udp --sport domain -j udp_acpt$chsuff
+
+#skype
+rule spts($skype-incoming-ports) dst(mac.lan) comment(skype 1o)
+cmp -A udp2lan -m udp -p udp -m multiport --sports 46528,64231 -d 192.168.71.230 -j udp_acpt2lan -m comment --comment "skype 1o"
+rule dpts($skype-incoming-ports) dst(mac.lan) comment(skype 1o)
+cmp -A udp2lan -m udp -p udp -d 192.168.71.230 -m multiport --dports 46528,64231 -j udp_acpt2lan -m comment --comment "skype 1o"
+
+rule dpts(netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds) src($iplan) dst($iplan)
+
+
+# TODO : Avahi
+rule  uid-owner($uid-avahi) gid-owner($gid-avahi) spt(mdns) dpt(mdns) dst($ipmdns)
+cmp -A udp2lan -m udp -p udp --sport mdns -d 224.0.0.251 --dport mdns -m owner --uid-owner 107 --gid-owner 996 -j udp_acpt2lan
+# 1003:151037 kernel: [235032.534188] TRACE: filter:drop2lan:rule:1 IN= OUT=enp4s0 SRC=192.168.71.222 DST=224.0.0.251 LEN=70 TOS=0x00 PREC=0x00 TTL=255 ID=0 DF PROTO=UDP SPT=5353 DPT=5353 LEN=50 UID=107 GID=996 
+# 1003:151037 kernel: [235032.534199] TRACE: filter:drop2lan:return:2 IN= OUT=enp4s0 SRC=192.168.71.222 DST=224.0.0.251 LEN=70 TOS=0x00 PREC=0x00 TTL=255 ID=0 DF PROTO=UDP SPT=5353 DPT=5353 LEN=50 UID=107 GID=996 
+
 
 spt - ; dpt - ; comment -
 
-# -A udpFlan -m udp -p udp -s $INET_IP,$LAN_IP_RANGE -d $mDNS_ADDRESS --sport mdns --dport mdns -j udp_oacptFlan
 
 
 
 
-rule target(odrop$chsuff) proto(-)
-cmp -A udp$chsuff -j odrop$chsuff
-# -A udpFlan -j udp_odropFlan
+rule target(drop$chsuff) proto(-)
+cmp -A udp$chsuff -j drop$chsuff
+# -A udp2lan -j udp_drop2lan
 
 

@@ -1,0 +1,5 @@
+#
+chain drop$chsuff
+target DROP
+rule
+cmp -A dropWin -j DROP

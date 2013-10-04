@@ -7,10 +7,13 @@ cmp -A $chsuff -m tcp  -p tcp -j tcp$chsuff
 
 chain tcp$chsuff
 
-rule target(oacpt$chsuff)
-cmp -A tcp$chsuff -j oacpt$chsuff
-# -A tcp2local -i $LO_IFACE -j oacptFlocal
+rule target(acpt$chsuff)
+cmp -A tcp$chsuff -j acpt$chsuff
+# -A tcp2local -i $LO_IFACE -j acptFlocal
 
-rule target(odrop$chsuff)
-cmp -A tcp$chsuff -j odrop$chsuff
-# -A tcp2local -j odrop2$chsuff
+chain drop$chsuff tcp$chsuff
+rule target(drop$chsuff)
+cmp -A tcp$chsuff -j drop$chsuff
+# -A tcp2local -j drop2$chsuff
+
+

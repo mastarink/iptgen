@@ -1,0 +1,20 @@
+#
+log-direction=inet
+chsuff=${chpref}$log-direction
+
+# output $ifinet
+target $chsuff
+
+rule comment(commonX)
+cmp -A $mainchain -j $chsuff -m comment --comment commonX
+#----------------------------------------
+output - ; input - 
+include acpt/main icmp/main tcp/main udp/main drop/main
+
+chain drop$chsuff $chsuff
+target drop$chsuff
+rule
+cmp -A Cinet -j dropCinet
+
+
+proto -

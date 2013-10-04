@@ -1,12 +1,19 @@
-log-direction=inet
-chsuff=${chpref}$log-direction
+#
+log-direction=@
 
-input $ifinet   ; target $chsuff  ; rule comment(inputI)
+input $if@
+target $chsuff
+
+rule comment(inputI)
 cmp -A INPUT -i enp2s0 -j $chsuff -m comment --comment inputI
-
+#----------------------------------------
 output - ; input - 
+include acpt/main icmp/main tcp/main udp/main drop/main
 
+chain drop$chsuff $chsuff
+target drop$chsuff
+
+rule
+cmp -A Finet -j dropFinet
 
 proto -
-
-include drop/main accept/main icmp/main tcp/main udp/main

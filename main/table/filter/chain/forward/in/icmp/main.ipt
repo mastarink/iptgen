@@ -1,0 +1,13 @@
+#
+chain icmp$chsuff $chsuff
+
+proto icmp
+icmp-type any
+
+rule target(icmp$chsuff)
+cmp -A Win -m icmp -p icmp --icmp-type any -j icmpWin
+#--------------------------------------------------
+chain icmp$chsuff
+target acpt$chsuff
+rule
+cmp -A icmpWin -m icmp -p icmp --icmp-type any -j acptWin

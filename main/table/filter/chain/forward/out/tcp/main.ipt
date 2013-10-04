@@ -1,0 +1,24 @@
+#
+chain tcp$chsuff $chsuff
+
+proto tcp
+
+rule target(tcp$chsuff)
+cmp -A Wout -m tcp -p tcp -j tcpWout
+#--------------------------------------------------
+chain tcp$chsuff
+target acpt$chsuff
+
+# skype
+rule dpt($skype-port-range) src(mac.lan) comment(skype-fw 2o)
+cmp -A tcpWout -m tcp -p tcp  -s 192.168.71.230 --dport 40000:49500  -j acptWout -m comment --comment "skype-fw 2o"
+
+# google (android etc.)
+rule dpts($http-ports) dst(+google) src(mac.lan)
+cmp -A tcpWout -m tcp -p tcp -s 192.168.71.230 -d 74.125.0.0/16,173.194.0.0/16,216.239.32.0/19 -m multiport --dports http,https -j acptWout
+
+# for (android etc.)
+rule dpts($http-ports)
+cmp -A tcpWout -m tcp -p tcp -m multiport --dports http,https -j acptWout
+rule dpt(5222:5230) src(mac.lan)
+cmp -A tcpWout -m tcp -p tcp -s 192.168.71.230 --dport 5222:5230 -j acptWout

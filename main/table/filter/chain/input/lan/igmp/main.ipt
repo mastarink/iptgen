@@ -1,0 +1,28 @@
+#
+chain igmp_acpt$chsuff igmp$chsuff $chsuff
+proto igmp
+
+target igmp$chsuff
+rule
+
+chain igmp$chsuff
+target igmp_acpt$chsuff
+
+rule src(mac.lan,mike.lan)
+cmp -A igmpFlan -p igmp -s 192.168.71.66,192.168.71.230 -j igmp_acptFlan
+
+
+chain igmp_acpt$chsuff
+
+rule target(acpt$chsuff)
+cmp -A igmp_acptFlan -p igmp -j acptFlan
+
+chain igmp_drop$chsuff
+
+rule target(drop$chsuff)
+cmp -A igmp_dropFlan -p igmp -j dropFlan
+
+chain igmp$chsuff
+
+rule target(drop$chsuff)
+cmp -A igmpFlan -p igmp -j dropFlan

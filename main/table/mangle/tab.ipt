@@ -1,8 +1,7 @@
-off 30
+# off 30
 l-comment on
-  wd mangle
   table  begin mangle
-    policy PREROUTING INPUT FORWARD OUTPUT POSTROUTING DROP
+    policy PREROUTING INPUT FORWARD OUTPUT POSTROUTING ACCEPT
   table  end mangle
 l-comment off
-on
+# on

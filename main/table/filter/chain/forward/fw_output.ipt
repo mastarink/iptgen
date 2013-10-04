@@ -1,9 +1,0 @@
-  log-way=to
-  chain FW2inet FW2lan FW2local FORWARD
-  output $ifinet    ; target FW2inet  ; rule comment(fwoutputI)
-  include fw_output_inet
-  output $iflan     ; target FW2lan   ; rule comment(fwoutputA)
-  include fw_output_lan
-  output $iflocal   ; target FW2local ; rule comment(fwoutputO)
-  include fw_output_local
-

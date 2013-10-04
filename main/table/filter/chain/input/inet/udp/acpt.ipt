@@ -1,0 +1,9 @@
+#
+chain udp_acpt$chsuff
+target acpt$chsuff
+
+rule target(acpt$chsuff) proto(-)
+cmp -A udp_acpt$chsuff  -j acpt$chsuff
+# -A udp_acptFinet  -j acptFinet
+
+target -

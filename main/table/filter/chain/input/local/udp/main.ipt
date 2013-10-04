@@ -5,19 +5,20 @@ rule target(udp$chsuff) proto(udp)
 cmp -A $chsuff -m udp  -p udp   -j udp$chsuff
 
 chain udp$chsuff
-target iacpt$chsuff
+target acpt$chsuff
 
 rule
-cmp -A udp$chsuff -j iacpt$chsuff
+cmp -A udp$chsuff -j acpt$chsuff
 
 rule
-cmp -A udp$chsuff -j iacpt$chsuff
-# -A udpFlocal -i $LO_IFACE -j iacptFlocal
+cmp -A udp$chsuff -j acpt$chsuff
+# -A udpFlocal -i $LO_IFACE -j acptFlocal
 
 rule  dpt(domain) proto(udp)
-cmp -A udp$chsuff -m udp -p udp --dport domain -j iacpt$chsuff
-# -A udpFlocal -m udp -p udp --dport domain -j iacptFlocal
+cmp -A udp$chsuff -m udp -p udp --dport domain -j acpt$chsuff
+# -A udpFlocal -m udp -p udp --dport domain -j acptFlocal
 
-rule target(idrop$chsuff)
-cmp -A udp$chsuff -j idrop$chsuff
-# -A udpFlocal -j idropFlocal
+chain drop$chsuff udp$chsuff
+rule target(drop$chsuff)
+cmp -A udp$chsuff -j drop$chsuff
+# -A udpFlocal -j dropFlocal
