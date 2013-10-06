@@ -7,11 +7,7 @@
   chain drop$chsuff
 
 # include listed
-
-  log-message=$log-drop-message
-  rule target(LOG) $log-options
-  cmp -A drop$chsuff -j LOG --log-prefix "ipt4: NOT from $log-direction" --log-uid $log-xoptions --log-level 7
-  # -A dropFlocal -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK from $chsuff " $IPTABLES_LOG_OPTS
-
+include log
+  
   target DROP ; rule
   cmp -A drop$chsuff -j DROP

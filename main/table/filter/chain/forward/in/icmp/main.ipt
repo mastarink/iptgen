@@ -1,13 +1,15 @@
 #
-chain icmp$chsuff $chsuff
+comment @ / fw / in
+proto @
+chain @$chsuff
 
-proto icmp
 icmp-type any
 
-rule target(icmp$chsuff)
-cmp -A Win -m icmp -p icmp --icmp-type any -j icmpWin
+rule chain($chsuff) target(@$chsuff)
+cmp -A Win -m icmp -p icmp --icmp-type any -j icmpWin -m comment --comment "icmp / fw / in"
 #--------------------------------------------------
-chain icmp$chsuff
 target acpt$chsuff
-rule
-cmp -A icmpWin -m icmp -p icmp --icmp-type any -j acptWin
+
+# accept all
+rule icmp-type(0)
+cmp -A icmpWin -m icmp -p icmp --icmp-type 0 -j acptWin -m comment --comment "icmp / fw / in"

@@ -1,0 +1,5 @@
+#
+comment &
+
+rule  dpt(&)
+cmp -A udp$chsuff -m udp -p udp --dport ntp -j udp_acpt$chsuff -m comment --comment ntp

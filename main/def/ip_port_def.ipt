@@ -19,16 +19,3 @@ skype-x_port=33033
 skype-port-range=40000:49500
 skype-incoming-ports=46528,64231
 
-gid-mastar-apps=1071
-gid-mastar-firefox=1022
-gid-mastar-mail=1074
-gid-mastar-xmpp=1073
-gid-mastar-skype=1068
-gid-mastar-nmap=1080
-gid-mastar-sopcast=1081
-
-gid-named=40
-gid-squid=31
-gid-portage=250
-gid-avahi=996
-uid-avahi=107

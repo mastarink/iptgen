@@ -1,1 +1,15 @@
 #
+comment @ / fw / out
+proto @
+chain @$chsuff
+
+icmp-type any
+
+rule chain($chsuff) target(@$chsuff)
+cmp -A Wout -m icmp -p icmp --icmp-type any -j icmpWout -m comment --comment "icmp / fw / out"
+#--------------------------------------------------
+target acpt$chsuff
+
+# accept all
+rule icmp-type(8)
+cmp -A icmpWout -m icmp -p icmp --icmp-type 8 -j acptWout -m comment --comment "icmp / fw / out"

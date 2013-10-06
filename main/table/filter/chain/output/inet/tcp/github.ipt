@@ -1,0 +1,5 @@
+#
+comment github
+rule dst(+git-github) dpt(ssh)
+cmp -A tcp2inet -m tcp -p tcp -d +git-github --dport ssh -j acpt2inet -m comment --comment github
+# -A tcp2inet $TCP_INET_OUT_OPTS -d $GIT_GENTOO_LIST               --dport git         -j ask_gentoo -m comment --comment gentoo

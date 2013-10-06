@@ -1,43 +1,27 @@
 #
-chain udp_acpt$chsuff udp$chsuff $chsuff
+comment @
+proto @
+chain @_acpt$chsuff @$chsuff
 
-include acpt
-
-proto udp
-rule target(udp$chsuff)
-cmp -A $chsuff -m udp  -p udp   -j udp$chsuff
+rule chain($chsuff) target(@$chsuff)
+cmp -A $chsuff -m udp  -p udp   -j udp$chsuff -m comment --comment udp
 
 # -----------------------------------------------
-chain udp$chsuff
-target udp_acpt$chsuff
+chain @$chsuff
+target @_acpt$chsuff
 
-rule  dpt(domain)
-cmp -A udp$chsuff -m udp -p udp --dport domain -j udp_acpt$chsuff
-# -A udp2lan -m udp -p udp --dport domain -j udp_acpt2lan
 
-rule  spt(domain)
-cmp -A udp$chsuff -m udp -p udp --sport domain -j udp_acpt$chsuff
-# -A udp2lan -m udp -p udp --dport domain -j udp_acpt2lan
-
-rule gid-owner($gid-mastar-skype) dpt($skype-x_port)
-cmp -A udp$chsuff -m udp -p udp --dport $skype-x_port -m owner --gid-owner $gid-mastar-skype -j udp_acpt2inet
-
-chain udp$chsuff 
+chain @$chsuff 
 rule gid-owner($gid-mastar-xmpp) dpt($ssdp_port) comment(IM client/SSDP)
 cmp -A udp2inet -m udp -p udp --dport 1900 -m owner --gid-owner 1073 -j udp_acpt2inet -m comment --comment "IM client/SSDP"
 
-#skype
-rule spts($skype-incoming-ports) src($ipinet) comment(skype 1o)
-cmp -A udp2inet -m udp -p udp -s 193.222.140.165 -m multiport --sports 46528,64231 -j udp_acpt2inet -m comment --comment "skype 1o"
+include ntp domain skype sopcast
 
-include sop
+spt - ; dpt -
 
-spt - ; dpt - ; comment -
+include acpt
 
-
-
-
-
+comment -
 
 rule target(drop$chsuff) proto(-)
 cmp -A udp$chsuff -j drop$chsuff

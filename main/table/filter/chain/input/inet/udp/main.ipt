@@ -8,7 +8,8 @@ cmp -A $chsuff -m udp  -p udp   -j udp$chsuff
 # -----------------------------------------------
 target @_acpt$chsuff
 
-include acpt domain skype sopcast
+include acpt ntp domain skype
+include sopcast
 
 proto -
 

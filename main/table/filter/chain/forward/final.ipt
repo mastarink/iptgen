@@ -1,5 +1,4 @@
-  rule target(LOG) $log-options
-  cmp -A FORWARD -j LOG --log-prefix "ipt4: NOT $log-way all (default) DROP FORWARD" --log-uid $log-xoptions --log-level 7
+#  
   rule target(DROP)
   cmp -A FORWARD -j DROP
 

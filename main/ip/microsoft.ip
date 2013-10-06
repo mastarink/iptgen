@@ -1,3 +1,3 @@
-include msft_gfs msft_1blk msft_global_net msft_hotmail
+include msft/msft_gfs msft/msft_1blk msft/msft_global_net msft/msft_hotmail
 111.221.64.0/18
-include msft_idc msftd
+include msft/msft_idc msft/msftd

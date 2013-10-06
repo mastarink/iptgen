@@ -5,7 +5,7 @@ defaut_policy=DROP
 chsuff=${chpref}$log-direction
 ;
 wd def
-include log_def if_def ip_port_def
+include log_def if_def ip_port_def group_def
 # target-ctl off LOG
 ;
 wd table ; include raw/tab mangle/tab nat/tab filter/tab

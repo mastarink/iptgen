@@ -3,11 +3,7 @@ chain udp_acpt$chsuff
 target acpt$chsuff
 
 
-
-
-
-
 rule target(acpt$chsuff)
-cmp -A udp_acpt$chsuff  -j acpt$chsuff
+cmp -A udp_acpt$chsuff -m udp -p udp -j acpt$chsuff -m comment --comment udp
 # -A udp_acpt2inet  -j acpt2inet
 

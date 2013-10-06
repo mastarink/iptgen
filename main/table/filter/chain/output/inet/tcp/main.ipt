@@ -23,15 +23,7 @@ include skype
 rule dst(+nmap) comment(nmap all tcp)
 cmp -A tcp2inet -m tcp -p tcp -d +nmap -j acpt2inet -m comment --comment "nmap all tcp"
 
-# radio
-# nrcu.gov.ua:8000
-# rule dst(+radio8000) dpt(8000) comment(radio 8000)
-allow +radio8000 8000 radio 8000
-cmp -A tcp2inet -m tcp -p tcp -d +radio8000 --dport 8000 -j acpt2inet -m comment --comment "radio 8000"
-allow media.brg.ua 8014 radio 8014
-cmp -A tcp2inet -m tcp -p tcp -d 217.20.164.163 --dport 8014 -j acpt2inet -m comment --comment "radio 8014"
-
-include mail http gentoo
+include mail http radio gentoo github git/main
 
 target drop$chsuff
 rule

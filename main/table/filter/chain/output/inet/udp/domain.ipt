@@ -1,0 +1,8 @@
+#
+comment &
+
+rule  dpt(&)
+cmp -A udp$chsuff -m udp -p udp --dport domain -j udp_acpt$chsuff -m comment --comment domain
+
+rule  spt(&)
+cmp -A udp$chsuff -m udp -p udp --sport domain -j udp_acpt$chsuff -m comment --comment domain

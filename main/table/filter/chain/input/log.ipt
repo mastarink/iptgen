@@ -1,0 +1,3 @@
+#
+  rule target(LOG) $log-options
+  cmp -A $mainchain -j LOG --log-prefix "ipt4: NOT $log-way all (default) DROP $mainchain" --log-uid $log-xoptions --log-level 7
