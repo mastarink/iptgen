@@ -1,98 +1,17 @@
 #
-chain udp_acpt$chsuff udp$chsuff $chsuff
-
-include acpt
+chain udp_acpt$chsuff udp$chsuff
 
 proto udp
-rule target(udp$chsuff)
+rule chain($chsuff) target(udp$chsuff)
 cmp -A $chsuff -m udp  -p udp   -j udp$chsuff
-
 # -----------------------------------------------
-chain udp$chsuff
 target udp_acpt$chsuff
-rule  dpt(domain)
-cmp -A udp$chsuff -m udp -p udp --dport domain -j udp_acpt$chsuff
-# -A udpFlan -m udp -p udp --dport domain -j udp_acptFlan
 
-rule src($iplan) spts(netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds)
-cmp  -A udp$chsuff -m udp -p udp -s 192.168.71.0/24 -m multiport --sports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds -j udp_acpt$chsuff
-# -A udpFlan -m udp -p udp -m multiport -s $LAN_IP_RANGE --sports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds -j udp_acptFlan
-
-rule dst($ipmdns) src(mac.lan) spt(mdns) dpt(mdns)
-cmp -A udpFlan -m udp -p udp -s 192.168.71.230 --sport mdns -d 224.0.0.251 --dport mdns -j udp_acptFlan
-
-rule dst($ipmdns) src(mac.lan) dpt(mdns)
-cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -d 224.0.0.251 --dport mdns -j udp_acptFlan
-
-#NAT-PMP
-rule dpt($nat-pmp_port) dst(back.mastar.lan) src(mac.lan)
-cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -d 192.168.71.2 --dport 5351 -j udp_acptFlan
-# TRACE: filter:dropFlan:rule:1 IN=enp4s0 OUT= MAC=00:00:1c:d3:d6:ad:00:14:51:3b:57:8c:08:00 SRC=192.168.71.230 DST=192.168.71.2 LEN=40 TOS=0x00 PREC=0x00 TTL=64 ID=22598 PROTO=UDP SPT=49637 DPT=5351 LEN=20 
+include domain mdns avahi dhcp nat-pmp samba skype acpt
 
 
-# Skype
-# -A udpFlan -m udp -p udp     -s $MAC_LAN_ADDRESS -d $INET_IP -m multiport --sports 64231,51634,36493,63700  -j udp_acptFlan -m comment --comment skype
-# -A udpFlan -m udp -p udp -s $MAC_LAN_ADDRESS  -d $INET_IP -m multiport --dports 64231,51634,36493,63700     -j udp_acptFlan -m comment --comment skype
-# -A udpFlan -m udp -p udp -s $MAC_LAN_ADDRESS,10.0.2.0/24 --dport 46528					    -j udp_acptFlan -m comment --comment skype
-#skype
-rule spts($skype-incoming-ports) src(mac.lan) comment(skype 1i)
-cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -m multiport --sports 46528,64231 -j udp_acptFlan -m comment --comment "skype 1i"
-rule dpts($skype-incoming-ports) src(mac.lan) comment(skype 2i)
-cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -m multiport --dports 46528,64231 -j udp_acptFlan -m comment --comment "skype 2i"
+spt - ; dpt - ; comment - ; proto -
 
 
-spt bootpc ; dpt bootps
-
-# mike.lan
-rule macsrc(00:0e:2e:26:1b:60) comment(dhcp_mike)
-cmp -A udp$chsuff -m udp -p udp -m mac --mac-source 00:0e:2e:26:1b:60 --sport bootpc --dport bootps -j udp_acpt$chsuff -m comment --comment dhcp_mike
-# -A udpFlan -m mac --mac-source 00:0e:2e:26:1b:60 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_mike
-
-# mac.lan
-rule macsrc(00:14:51:3b:57:8c) comment(dhcp_mac)
-cmp -A udp$chsuff -m udp -p udp -m mac --mac-source 00:14:51:3b:57:8c --sport bootpc --dport bootps -j udp_acpt$chsuff -m comment --comment dhcp_mac
-# -A udpFlan -m mac --mac-source 00:14:51:3b:57:8c -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_mac
-
-# gnome400.lan ?
-# -A udpFlan -m mac --mac-source 00:00:1c:d3:d8:73 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_g4
-
-# virtualbox machines
-comment dhcp_vb
-rule macsrc(08:00:27:0a:3e:c8)
-cmp -A udp$chsuff -m udp -p udp -m mac --mac-source 08:00:27:0a:3e:c8 --sport bootpc --dport bootps -j udp_acpt$chsuff -m comment --comment dhcp_vb
-# -A udpFlan -m mac --mac-source 08:00:27:0a:3e:c8 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-rule macsrc(08:00:27:0f:ee:18)
-# -A udpFlan -m mac --mac-source 08:00:27:0f:ee:18 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-rule macsrc(08:00:27:33:79:df)
-# -A udpFlan -m mac --mac-source 08:00:27:33:79:df -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-rule macsrc(08:00:27:37:03:94)
-# -A udpFlan -m mac --mac-source 08:00:27:37:03:94 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-rule macsrc(08:00:27:5a:7c:f3)
-# -A udpFlan -m mac --mac-source 08:00:27:5a:7c:f3 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-rule macsrc(08:00:27:64:1b:a8)
-# -A udpFlan -m mac --mac-source 08:00:27:64:1b:a8 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-rule macsrc(08:00:27:6A:A8:E3)
-# -A udpFlan -m mac --mac-source 08:00:27:6A:A8:E3 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-rule macsrc(08:00:27:9E:08:F7)
-# -A udpFlan -m mac --mac-source 08:00:27:9E:08:F7 -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-rule macsrc(08:00:27:df:d0:fa)
-# -A udpFlan -m mac --mac-source 08:00:27:df:d0:fa -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-rule macsrc(08:00:27:e4:69:0f)
-# -A udpFlan -m mac --mac-source 08:00:27:e4:69:0f -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-rule macsrc(08:00:27:e8:f1:3a)
-# -A udpFlan -m mac --mac-source 08:00:27:e8:f1:3a -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-rule macsrc(08:00:27:f0:82:3f)
-# -A udpFlan -m mac --mac-source 08:00:27:f0:82:3f -m udp -p udp --sport bootpc --dport bootps -j udp_acptFlan -m comment --comment dhcp_vb
-
-spt - ; dpt - ; comment -
-
-# -A udpFlan -m udp -p udp -s $INET_IP,$LAN_IP_RANGE -d $mDNS_ADDRESS --sport mdns --dport mdns -j udp_acptFlan
-
-
-
-
-rule target(drop$chsuff) proto(-)
+rule target(drop$chsuff)
 cmp -A udp$chsuff -j drop$chsuff
-# -A udpFlan -j udp_dropFlan
-
-

@@ -1,0 +1,13 @@
+#
+
+rule src($iplan-ping) icmp-type(0) comment(icmp8 all answer [ping])
+cmp -A icmpFlan -m icmp -p icmp --icmp-type 0 -s $iplan-ping -j icmp_acptFlan -m comment --comment "icmp8 all answer [ping]"
+
+# to ping from there
+rule src($iplan-ping) icmp-type(8) comment(ping lan i2)
+cmp -A icmpFlan -m icmp -p icmp --icmp-type 8 -s $iplan-ping -j icmp_acptFlan -m comment --comment "ping lan i2"
+
+rule src($iplan-ping) icmp-type(3) comment(ping lan i3)
+cmp -A icmpFlan -m icmp -p icmp --icmp-type 3 -s $iplan-ping -j icmp_acptFlan -m comment --comment "ping lan i3"
+
+

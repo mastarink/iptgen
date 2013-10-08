@@ -2,11 +2,6 @@
 chain udp_acpt$chsuff
 target acpt$chsuff
 
-# -A udp_acpt2lan -m udp -p udp -m multiport -s $LAN_IP_RANGE --sports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds -j ACCEPT
-
-# -A udp_acpt2lan -m udp -p udp --dport domain -s $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS -j ACCEPT
-# -A udp_acpt2lan -m udp -p udp --sport domain -d $MAC_LAN_ADDRESS,$MIKE_LAN_ADDRESS -j ACCEPT
 
 rule target(acpt$chsuff)
-cmp -A udp_acpt$chsuff  -j acpt$chsuff
-# -A udp_acpt2lan  -j acpt2lan
+cmp -A udp_acpt$chsuff -m udp -p udp  -j acpt$chsuff

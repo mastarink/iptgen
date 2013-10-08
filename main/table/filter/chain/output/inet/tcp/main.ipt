@@ -14,16 +14,9 @@ cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports xmpp-client,aol -j acpt2ine
 # cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports xmpp-client,aol -m owner --gid-owner 1073 -j acpt2inet -m comment --comment "IM client"
 # -A tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports xmpp-client,5050,aol  -j acpt2inet_nolog -m comment --comment "IM client"
 
-rule dpts(nicname,rwhois) comment(WHOIS client)
-cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports nicname,rwhois -j acpt2inet -m comment --comment "WHOIS client"
-# -A tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports nicname,rwhois        -j acpt2inet -m comment --comment "WHOIS client"
 
-include skype
 
-rule dst(+nmap) comment(nmap all tcp)
-cmp -A tcp2inet -m tcp -p tcp -d +nmap -j acpt2inet -m comment --comment "nmap all tcp"
-
-include mail http radio gentoo github git/main
+include nmap whois mail http radio gentoo github git/main skype
 
 target drop$chsuff
 rule

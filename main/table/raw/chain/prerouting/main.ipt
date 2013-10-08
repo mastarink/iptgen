@@ -1,0 +1,17 @@
+#
+  chain PREROUTING 
+  
+  rule proto(tcp) spts(5228) input($ifinet) target(ACCEPT)
+  cmp -A PREROUTING -i enp2s0 -m tcp -p tcp -m multiport  --sports 5228 -j ACCEPT
+
+  rule proto(tcp) spts($http-ports,445) input($ifinet) target(ACCEPT)
+  cmp -A PREROUTING -i enp2s0 -m tcp -p tcp -m multiport --sports http,https,445 -j ACCEPT
+  rule proto(tcp) dpts($http-ports,445) input($ifinet) target(ACCEPT)
+  cmp -A PREROUTING -i enp2s0 -m tcp -p tcp -m multiport --dports http,https,445 -j ACCEPT
+  
+  rule input($iflocal) target(ACCEPT)
+  cmp -A PREROUTING -i lo -j ACCEPT
+#------------------------------------------------------------
+  rule 
+  cmp -A PREROUTING -j TRACE
+

@@ -1,0 +1,8 @@
+#
+comment &
+
+rule spts($skype-incoming-ports) src(mac.lan) comment(skype 1i)
+cmp -A tcpFlan -m tcp -p tcp -s 192.168.71.230 -m multiport --sports 46528,64231 -j tcp_acpt$chsuff -m comment --comment "skype 1i"
+rule dpts($skype-incoming-ports) src(mac.lan) comment(skype 2i)
+cmp -A tcpFlan -m tcp -p tcp -s 192.168.71.230 -m multiport --dports 46528,64231 -j tcp_acpt$chsuff -m comment --comment "skype 2i"
+

@@ -1,31 +1,13 @@
 #
-chain tcp_acpt$chsuff tcp$chsuff
-proto tcp
-# squid
+chain @_acpt$chsuff @$chsuff
+proto @
 target tcp_acpt$chsuff
 
-rule src(dns.mastar.lan) dst(mac.lan) spt(domain) dpt(mdns) gid-owner($gid-named)
-cmp -A tcp2lan -m tcp -p tcp -s 192.168.71.10 --sport domain -d 192.168.71.230 --dport mdns -m owner --gid-owner 40 -j tcp_acpt2lan
-
-rule src(proxy.mastar.lan) spt($squid_port)
-cmp -A tcp2lan -m tcp -p tcp -s 192.168.71.11 --sport 3128 -j tcp_acpt2lan
-# -A tcp_acpt2lan -m tcp -p tcp --sport $SQUID_PORT -s $PROXY_LAN_ADDRESS -j ACCEPT
-
-rule src(back.mastar.lan) dst(mac.lan) dpt(ssh) comment(ssh to mac.lan as server)
-cmp -A tcp2lan -m tcp -p tcp -s 192.168.71.2 -d 192.168.71.230 --dport ssh -j tcp_acpt2lan -m comment --comment "ssh to mac.lan as server"
-# -A tcp2lan -d $MAC_LAN_ADDRESS -s $SSH_LOCAL_SERVERS -m tcp -p tcp --sport ssh  -j tcp_acpt2lan -m comment --comment "ssh server me21 client 230 (mac.lan)"
-
-#skype
-#?? rule dpt($skype-port-range) comment(skype 1o)
-#?? cmp -A tcp2lan -m tcp -p tcp --dport 40000:49500  -j tcp_acpt2lan -m comment --comment "skype 1o"
-rule dpts($skype-incoming-ports) dst(mac.lan) comment(skype 2o)
-cmp -A tcp2lan -m tcp -p tcp -d 192.168.71.230 -m multiport --dports 46528,64231 -j tcp_acpt2lan -m comment --comment "skype 2o"
-rule spts($skype-incoming-ports) dst(mac.lan) comment(skype 3o)
-cmp -A tcp2lan -m tcp -p tcp -m multiport --sports 46528,64231 -d 192.168.71.230 -j tcp_acpt2lan -m comment --comment "skype 3o"
+include domain nmap squid ssh skype
 
 
 chain $chsuff
-rule target(tcp$chsuff) proto(tcp)
+rule target(@$chsuff)
 cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
 
 include acpt

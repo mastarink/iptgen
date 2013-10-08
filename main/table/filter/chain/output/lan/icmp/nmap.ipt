@@ -1,0 +1,7 @@
+#
+rule  comment(ping13 all) icmp-type(13) dst($iplan-nmap) gid-owner($gid-mastar-nmap)
+cmp -A icmp2lan -m icmp -p icmp --icmp-type 13 -d $iplan-nmap -m owner --gid-owner 1080 -j icmp_acpt2lan -m comment --comment "ping13 all"
+
+rule  comment(icmp8 all [nmap]) icmp-type(8) dst($iplan-nmap) gid-owner($gid-mastar-nmap)
+cmp -A icmp2lan -m icmp -p icmp --icmp-type 8 -d $iplan-nmap -m owner --gid-owner 1080 -j icmp_acpt2lan -m comment --comment "icmp8 all [nmap]"
+

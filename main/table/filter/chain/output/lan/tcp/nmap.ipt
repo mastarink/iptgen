@@ -1,0 +1,5 @@
+#
+comment &
+
+rule dst($iplan-x) comment(nmap all tcp)
+cmp -A tcp2lan -m tcp -p tcp -d $iplan-x -j tcp_acpt2lan -m comment --comment "nmap all tcp"

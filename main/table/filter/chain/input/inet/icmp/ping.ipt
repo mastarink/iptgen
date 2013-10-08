@@ -1,0 +1,4 @@
+#
+
+rule src(+ping8all,+ping8) icmp-type(0) comment(icmp8 all answer [ping])
+cmp -A icmpFinet -m icmp -p icmp --icmp-type 0 -s +{ping8,ping8all} -j acptFinet -m comment --comment "icmp8 all answer [ping]"

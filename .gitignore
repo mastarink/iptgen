@@ -4,3 +4,7 @@ iptables.built*
 *.vim
 save-*
 built.diff
+*.log
+*.txt
+*.ip
+*.good

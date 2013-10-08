@@ -1,25 +1,15 @@
 #
-chain tcp_acpt$chsuff tcp$chsuff
-proto tcp
-target tcp_acpt$chsuff
+# comment @
 
-# squid
-rule dst(proxy.mastar.lan) dpt($squid_port)
-cmp -A tcpFlan -m tcp -p tcp -d 192.168.71.11 --dport 3128 -j tcp_acptFlan
-# -A tcp_acptFlan  -m tcp -p tcp --dport $SQUID_PORT -d $PROXY_LAN_ADDRESS -j acptFlan
+chain @_acpt$chsuff @$chsuff
+proto @
+target @_acpt$chsuff
 
-rule dst(back.mastar.lan) src(mac.lan) spt(ssh) comment(ssh from mac.lan as server)
-cmp -A tcpFlan -m tcp -p tcp -s 192.168.71.230 --sport ssh -d 192.168.71.2 -j tcp_acptFlan -m comment --comment "ssh from mac.lan as server"
-
-#skype
-rule spts($skype-incoming-ports) src(mac.lan) comment(skype 1i)
-cmp -A tcpFlan -m tcp -p tcp -s 192.168.71.230 -m multiport --sports 46528,64231 -j tcp_acpt$chsuff -m comment --comment "skype 1i"
-rule dpts($skype-incoming-ports) src(mac.lan) comment(skype 2i)
-cmp -A tcpFlan -m tcp -p tcp -s 192.168.71.230 -m multiport --dports 46528,64231 -j tcp_acpt$chsuff -m comment --comment "skype 2i"
+include nmap ssh squid skype
 
 
 chain $chsuff
-rule target(tcp$chsuff)
+rule target(@$chsuff)
 cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
 
 include acpt

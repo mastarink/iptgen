@@ -1,0 +1,6 @@
+#
+comment &
+
+rule dst(proxy.mastar.lan) dpt($squid_port)
+cmp -A tcpFlan -m tcp -p tcp -d 192.168.71.11 --dport 3128 -j tcp_acptFlan -m comment --comment squid
+

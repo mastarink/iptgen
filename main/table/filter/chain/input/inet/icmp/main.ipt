@@ -7,12 +7,7 @@ cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
 
 target acpt$chsuff
 
-include sopcast
-
-rule src(+nmap,+ping8all,+ping8) icmp-type(0) comment(icmp8 all answer [ping,nmap])
-cmp -A icmpFinet -m icmp -p icmp --icmp-type 0 -s +{ping8,nmap,ping8all} -j acptFinet -m comment --comment "icmp8 all answer [ping,nmap]"
-# cmp -A icmpFinet -m icmp -p icmp --icmp-type 0 -s 188.244.26.74,188.244.26.91,193.222.140.165 -j acptFinet -m comment --comment "icmp8 all answer [ping,nmap]"
-
+include nmap ping sopcast
 
 icmp-type -
 proto -

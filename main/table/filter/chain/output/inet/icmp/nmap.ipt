@@ -1,0 +1,7 @@
+#
+rule  comment(ping13 all) icmp-type(13) dst(+nmap) gid-owner($gid-mastar-nmap)
+cmp -A icmp2inet -m icmp -p icmp --icmp-type 13 -d +nmap -m owner --gid-owner 1080 -j acpt2inet -m comment --comment "ping13 all"
+
+rule  comment(icmp8 all [nmap]) icmp-type(8) dst(+nmap) gid-owner($gid-mastar-nmap)
+cmp -A icmp2inet -m icmp -p icmp --icmp-type 8 -d +nmap -m owner --gid-owner 1080 -j acpt2inet -m comment --comment "icmp8 all [nmap]"
+# cmp -A icmp2inet -m icmp -p icmp --icmp-type 8 -d 188.244.26.74,188.244.26.91,193.222.140.165 -j acpt2inet -m comment --comment "icmp8 all [nmap]"

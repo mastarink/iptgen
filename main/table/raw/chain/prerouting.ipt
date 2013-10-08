@@ -1,0 +1,18 @@
+#
+  log-way=from
+  chpref=R
+  mainchain=PREROUTING
+# chain ${chpref}inet ${chpref}lan ${chpref}local $mainchain
+
+  proto -
+  wd prerouting
+  
+  include main
+
+  log-direction=all
+  log-plus= (default) $mainchain
+  log-message=$log-drop-message
+
+# include final
+  log-plus=
+

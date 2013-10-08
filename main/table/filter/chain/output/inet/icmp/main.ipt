@@ -1,28 +1,15 @@
 #
-chain drop$chsuff icmp$chsuff $chsuff
-proto icmp
+chain drop$chsuff @$chsuff
+proto @
+
 icmp-type any
-rule target(icmp$chsuff)
+rule chain($chsuff) target(@$chsuff)
 cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
+#----------------------------------------
 
 target acpt$chsuff
-chain icmp$chsuff
 
-
-rule  comment(icmp8 all [ping,nmap]) icmp-type(8) dst(+nmap,+ping8all,+ping8)
-cmp -A icmp2inet -m icmp -p icmp --icmp-type 8 -d +{ping8,nmap,ping8all} -j acpt2inet -m comment --comment "icmp8 all [ping,nmap]"
-# cmp -A icmp2inet -m icmp -p icmp --icmp-type 8 -d 188.244.26.74,188.244.26.91,193.222.140.165 -j acpt2inet -m comment --comment "icmp8 all [ping,nmap]"
-
-rule  comment(ping13 all) icmp-type(13) dst(+nmap) gid-owner($gid-mastar-nmap)
-cmp -A icmp2inet -m icmp -p icmp --icmp-type 13 -d +nmap -m owner --gid-owner 1080 -j acpt2inet -m comment --comment "ping13 all"
-
-rule  dst(+ping3) comment(ping3) icmp-type(3)
-cmp -A icmp2inet -m icmp -p icmp --icmp-type 3  -d 4.2.2.2 -j acpt2inet -m comment --comment ping3
-
-rule  comment(ping3 all) icmp-type(3)
-cmp -A icmp2inet -m icmp -p icmp --icmp-type 3 -j acpt2inet -m comment --comment "ping3 all"
-
-#TODO 1002:081011 kernel: [123724.998866] TRACE: filter:OUTPUT:rule:1 IN= OUT=enp2s0 SRC=193.222.140.165 DST=4.2.2.2 LEN=130 TOS=0x00 PREC=0xC0 TTL=64 ID=50655 PROTO=ICMP TYPE=3 CODE=3 [SRC=4.2.2.2 DST=193.222.140.165 LEN=102 TOS=0x00 PREC=0x80 TTL=60 ID=3264 PROTO=UDP SPT=53 DPT=3823 LEN=82 ] 
+include nmap ping
 
 icmp-type -
 proto -

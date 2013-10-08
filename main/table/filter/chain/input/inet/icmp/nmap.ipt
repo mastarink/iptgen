@@ -1,0 +1,4 @@
+#
+
+rule src(+nmap) icmp-type(0) comment(icmp8 all answer [nmap])
+cmp -A icmpFinet -m icmp -p icmp --icmp-type 0 -s +nmap -j acptFinet -m comment --comment "icmp8 all answer [nmap]"

@@ -1,0 +1,7 @@
+#
+
+rule spts($skype-incoming-ports) dst(mac.lan) comment(skype 1o)
+cmp -A udp2lan -m udp -p udp -m multiport --sports 46528,64231 -d 192.168.71.230 -j udp_acpt2lan -m comment --comment "skype 1o"
+rule dpts($skype-incoming-ports) dst(mac.lan) comment(skype 1o)
+cmp -A udp2lan -m udp -p udp -d 192.168.71.230 -m multiport --dports 46528,64231 -j udp_acpt2lan -m comment --comment "skype 1o"
+

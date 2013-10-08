@@ -1,0 +1,6 @@
+#
+
+rule src($iplan) spts(netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds)
+cmp  -A udp$chsuff -m udp -p udp -s 192.168.71.0/24 -m multiport --sports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds -j udp_acpt$chsuff
+# -A udpFlan -m udp -p udp -m multiport -s $LAN_IP_RANGE --sports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds -j udp_acptFlan
+

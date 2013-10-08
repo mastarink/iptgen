@@ -1,0 +1,11 @@
+#
+rule  dst(+ping3) comment(ping3) icmp-type(3)
+cmp -A icmp2inet -m icmp -p icmp --icmp-type 3  -d 4.2.2.2 -j acpt2inet -m comment --comment ping3
+
+rule  comment(ping3 all) icmp-type(3)
+cmp -A icmp2inet -m icmp -p icmp --icmp-type 3 -j acpt2inet -m comment --comment "ping3 all"
+
+rule  comment(icmp8 all [ping]) icmp-type(8) dst(+ping8all,+ping8)
+cmp -A icmp2inet -m icmp -p icmp --icmp-type 8 -d +{ping8,ping8all} -j acpt2inet -m comment --comment "icmp8 all [ping]"
+# cmp -A icmp2inet -m icmp -p icmp --icmp-type 8 -d 188.244.26.74,188.244.26.91,193.222.140.165 -j acpt2inet -m comment --comment "icmp8 all [ping]"
+

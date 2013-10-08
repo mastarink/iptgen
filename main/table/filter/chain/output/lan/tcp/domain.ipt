@@ -1,0 +1,6 @@
+#
+comment &
+
+rule src(dns.mastar.lan) dst(mac.lan) spt(domain) dpt(mdns) gid-owner($gid-named)
+cmp -A tcp2lan -m tcp -p tcp -s 192.168.71.10 --sport domain -d 192.168.71.230 --dport mdns -m owner --gid-owner 40 -j tcp_acpt2lan -m comment --comment domain
+

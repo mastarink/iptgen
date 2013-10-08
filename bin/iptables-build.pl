@@ -37,10 +37,11 @@ my $output_namecomment=1;
 my $output_empty_lines=1;
 my $ipt_num=0;
 my %resolved;
-my %off_targets;
+my %targets_disabled;
+my %includes_disabled;
 my @errors;
 my ($last_literal, $last_command, $cmp_disabled);
-my @basic_propset=qw/chain target output input proto dst src macdst macsrc dpt spt ctstate uid-owner gid-owner icmp-type helper comment/;
+my @basic_propset=qw/chain target output input proto dst src macdst macsrc dpt not-dpt spt not-spt ctstate uid-owner gid-owner icmp-type helper comment/;
 sub build_names;
 
 sub outerr
@@ -324,7 +325,9 @@ sub make_command_rule
 		 'gid-owner'=>{name=>'-gid-owner', order=>10000, module=>{'gid-owner'=>'owner'}},
 		 'icmp-type'=>{name=>'-icmp-type', order=>170},
 		 dpt=>{name=>'-dport', order=>1040},
+		 'not-dpt'=>{name=>'-dport', order=>1040, prefix=>'!'},
 		 dpts=>{name=>'-dports', order=>1040, module=>{dpts=>'multiport'}},
+		 'not-dpts'=>{name=>'-dports', order=>1040, module=>{'not-dpts'=>'multiport'}, prefix=>'!'},
 		 dst=>{name=>'d', order=>1030, process=>'make_address'},
 		 helper=>{name=>'-helper', order=>200, module=>{helper=>'helper'}},
 		 input=> {name=>'i', order=>110},
@@ -334,7 +337,9 @@ sub make_command_rule
 		 output=>{name=>'o', order=>120},
 		 proto=>{name=>'p', order=>150, module=>{tcp=>'tcp',udp=>'udp',icmp=>'icmp'}},
 		 spt=>{name=>'-sport', order=>1020},
+		 'not-spt'=>{name=>'-sport', order=>1020, prefix=>'!'},
 		 spts=>{name=>'-sports', order=>1020, module=>{spts=>'multiport'}},
+		 'not-spts'=>{name=>'-sports', order=>1020, module=>{'not-spts'=>'multiport'}, prefix=>'!'},
 		 src=>{name=>'s', order=>1010, process=>'make_address'},
 		 tail=>{name=>'', order=>100000},
 		 target=>{name=>'j', order=>100000},
@@ -414,13 +419,15 @@ sub make_command_rule
 	}
 	else
 	{
-	  $line.='-'.$names{$name}->{name}.' '.$opts{$name};
+	  my $prefix;
+	  $prefix=$names{$name}->{prefix}.' ' if exists($names{$name}->{prefix});
+	  $line.=$prefix.'-'.$names{$name}->{name}.' '.$opts{$name};
 	  push @line, $line;
 	}
       }
     }
     $cmp_disabled=1;
-    if (!exists $opts{target} || !exists($off_targets{$opts{target}}) )
+    if (!exists $opts{target} || !exists($targets_disabled{$opts{target}}) )
     {
       output_command '', @line;
       undef $cmp_disabled;
@@ -492,12 +499,12 @@ sub make_command_target_ctl
   if ($subcmd eq 'off')
   {
 #   outerr __LINE__, 'TARGET OFF: '.join(' ', @command);
-    $off_targets{$_}=1 for (@command);
+    $targets_disabled{$_}=1 for (@command);
   }
 }
 sub make_command_array
 {
-  my ($command)=@_;
+  my ($level, $command)=@_;
   my $main;
   $main=shift @$command;
   if ($main eq 'table')
@@ -544,7 +551,7 @@ sub make_command_array
   }
   elsif ($main eq 'include')
   {
-    build_names @$command;
+    build_names $level + 1, @$command;
   }
   elsif ($main eq 'wd' )
   {
@@ -560,7 +567,9 @@ sub make_command_array
 	|| $main eq 'mac-source'
 	|| $main eq 'mac-dst?'
 	|| $main eq 'spt'
+	|| $main eq 'not-spt'
 	|| $main eq 'dpt'
+	|| $main eq 'not-dpt'
 	|| $main eq 'icmp-type'
 	|| $main eq 'uid-owner'
 	|| $main eq 'gid-owner'
@@ -598,16 +607,17 @@ sub make_shortcuts
 }
 sub make_command
 {
-  my ($command)=@_;
+  my ($level, $command)=@_;
   my @command;
   @command=split /\s+/, $command;
   make_substitutionz \@command;
   make_shortcuts \@command;
-  make_command_array \@command;
+  make_command_array $level, \@command;
 }
 
 sub make_commands
 {
+  my $level=shift @_;
   for (@_)
   {
     if (/^\s*[#\-]/)
@@ -621,7 +631,7 @@ sub make_commands
     }
     elsif (/^\s*(.*?)\s*$/)
     {
-      make_command $1;
+      make_command $level, $1;
     }
     else
     {
@@ -631,8 +641,8 @@ sub make_commands
 }
 sub make_opened_file
 {
+  my ($level, $conf)=@_;
   my $nl=0;
-  my ($conf)=@_;
   my @command_lines;
   while(<$conf>)
   {
@@ -648,19 +658,19 @@ sub make_opened_file
     }
     $nl++;
   }
-  make_commands @command_lines;
+  make_commands $level, @command_lines;
 }
 
 sub make_file
 {
-  my ($conffile)=@_;
+  my ($level, $conffile)=@_;
   local *conf;
   outlog __LINE__,"opening $conffile\n";
 # output_literal "# --                      file: $conffile";
   if (open conf, "<$conffile")
   {
     outlog __LINE__,"opened $conffile\n";
-    make_opened_file \*conf;
+    make_opened_file $level, \*conf;
     close conf;
     outlog __LINE__,"closed $conffile\n";
   }
@@ -672,7 +682,7 @@ sub make_file
 
 sub build_iptables
 {
-  my ($fname)=@_;
+  my ($level, $fname)=@_;
   $incdir="$confdir/main" if (!$incdir);
   my $conffile=$incdir;
   $conffile.="/$workdir" if $workdir;
@@ -691,7 +701,7 @@ sub build_iptables
 ##  outmsg __LINE__, "$incdir / $workdir @ $conffile";
 ##  outmsg __LINE__, "$conffile exists";
     outlog __LINE__, "$conffile exists";
-    make_file $conffile;
+    make_file $level, $conffile;
   }
   else
   {
@@ -728,6 +738,7 @@ sub save_context
   $saved->{current_chain}=$chain;
   $saved->{workdir}=$workdir;
   $saved->{incdir}=$incdir;
+  $saved->{current_build_file}=$current_build_file;
 #     outmsg __LINE__, "PUSH chain $chain";
   for my $prop (@basic_propset)
   {      $saved->{$prop}=$tables{$current_table}{$prop};     }
@@ -743,6 +754,7 @@ sub restore_context
   $chain=$saved->{current_chain};
   $workdir=$saved->{workdir};
   $incdir=$saved->{incdir};
+  $current_build_file=$saved->{current_build_file};
   if ($chain)
   {
     make_command_chain $chain;
@@ -755,26 +767,33 @@ sub restore_context
 }
 sub build_names
 {
-  my (@names)=@_;
+  my ($level, @names)=@_;
   if ( $confdir )
   {
     for my $name (@names)
     {
-      save_context;
+      unless (exists($includes_disabled{$name}))
       {
-	if ( $output_namecomment >0 ) { output_literal "# ++++++++++++++++++++++++++++++++++++++ name: $name"; }
-	build_iptables $name;
-	if ( $output_namecomment >0 ) { output_literal "# -------------------------------------- name: $name"; }
+	save_context;
+	{
+	  if ( $output_namecomment >0 ) { output_literal "# ++++++++++++++++++++++++++++++++++++++ name: $name"; }
+	  printf STDERR "> [%".($level*3)."s] ------\r", ${name};
+	  build_iptables $level, $name;
+	  printf STDERR "< [%".($level*3)."s] ------\r", ${name};
+	  if ( $output_namecomment >0 ) { output_literal "# -------------------------------------- name: $name"; }
+	}
+	restore_context;
       }
-      restore_context;
+      else
+      {
+        outmsg __LINE__, "DISABLED include $name";
+      }
     } 
   }
 }
 sub main
 {
   my (@args)=@_;
-  local *loadip;
-  local *saveip;
   local *save;
   local *tocat;
   make_confdir;
@@ -791,8 +810,36 @@ sub main
       { $only_chain=$_; }
     }
     {
+      if (-r "$confdir/main/opts/main.opts")
+      {
+        local *loadopts;
+	if ( open loadopts, '<', "$confdir/main/opts/main.opts" )
+	{
+	  while(<loadopts>)
+	  {
+	    if (/^\s*(\w+)\s*:\s*(\w*)\s*$/)
+	    {
+	      my $id=$1;
+	      my $opt=$2;
+	      if ($opt eq 'off')
+	      {
+	        $includes_disabled{$id}=1;
+		outmsg __LINE__, "DISABLING include $id";
+	      }
+	      elsif ($opt eq 'on')
+	      {
+	        delete $includes_disabled{$id};
+	      }
+	    }
+	  }
+	  close loadopts;
+	}
+      }
+    }
+    {
       if (-r "$confdir/iptables.ip")
       {
+        local *loadip;
 	if ( open loadip, '<', "$confdir/iptables.ip" )
 	{
 	  while(<loadip>)
@@ -817,6 +864,7 @@ sub main
       }
     }
     {
+      local *saveip;
       if ( open saveip, '>', "$confdir/iptables0.ip" )
       {
 	for my $name (sort keys %resolved)
@@ -826,8 +874,9 @@ sub main
 	close saveip;
       }
     }
-    build_names 'main';
+    build_names 0, 'main';
     {
+      local *saveip;
       if ( open saveip, '>', "$confdir/iptables.ip" )
       {
 	for my $name (sort keys %resolved)
@@ -858,8 +907,8 @@ sub main
     }
     elsif (system('diff iptables.built iptables.good >built.diff'))
     { print STDERR "\n\n@@ >>>>>>>>> DIFFERENCES from iptables.good DETECTED <<<<<<<<<<<<\n\n"; }
-    else
-    { printf STDERR "\n\n@@ >>>>>>>> CHECK %s <<<<<<<<<<<<\n", system("/sbin/iptables-restore -t $save_file") == 0?'OK':'FAIL'; }
+    
+    printf STDERR "\n\n@@ >>>>>>>> CHECK %s <<<<<<<<<<<<\n", system("/sbin/iptables-restore -t $save_file") == 0?'OK':'FAIL';
     print STDERR "#-------------------------\n";
   }
 }

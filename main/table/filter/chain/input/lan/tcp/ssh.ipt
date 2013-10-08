@@ -1,0 +1,5 @@
+#
+comment &
+
+rule dst(back.mastar.lan) src(mac.lan) spt(ssh) comment(ssh from mac.lan as server)
+cmp -A tcpFlan -m tcp -p tcp -s 192.168.71.230 --sport ssh -d 192.168.71.2 -j tcp_acptFlan -m comment --comment "ssh from mac.lan as server"

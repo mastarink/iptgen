@@ -1,0 +1,7 @@
+#
+comment &
+
+rule dpts(nicname,rwhois) comment(WHOIS client)
+cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports nicname,rwhois -j acpt2inet -m comment --comment "WHOIS client"
+# -A tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports nicname,rwhois        -j acpt2inet -m comment --comment "WHOIS client"
+

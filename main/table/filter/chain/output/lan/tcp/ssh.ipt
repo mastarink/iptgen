@@ -1,0 +1,7 @@
+#
+comment &
+
+rule src(back.mastar.lan) dst(mac.lan) dpt(ssh) comment(ssh to mac.lan as server)
+cmp -A tcp2lan -m tcp -p tcp -s 192.168.71.2 -d 192.168.71.230 --dport ssh -j tcp_acpt2lan -m comment --comment "ssh to mac.lan as server"
+# -A tcp2lan -d $MAC_LAN_ADDRESS -s $SSH_LOCAL_SERVERS -m tcp -p tcp --sport ssh  -j tcp_acpt2lan -m comment --comment "ssh server me21 client 230 (mac.lan)"
+

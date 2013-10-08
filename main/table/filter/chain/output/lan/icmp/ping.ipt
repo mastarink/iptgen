@@ -1,0 +1,12 @@
+#
+dst $iplan-ping
+
+rule  comment(ping3 all) icmp-type(3)
+cmp -A icmp2lan -m icmp -p icmp --icmp-type 3 -d $iplan-ping -j icmp_acpt2lan -m comment --comment "ping3 all"
+
+rule  comment(icmp8 all [ping]) icmp-type(8)
+cmp -A icmp2lan -m icmp -p icmp --icmp-type 8 -d $iplan-ping -j icmp_acpt2lan -m comment --comment "icmp8 all [ping]"
+
+rule comment(icmp0 all [ping]) icmp-type(0)
+cmp -A icmp2lan -m icmp -p icmp --icmp-type 0 -d $iplan-ping -j icmp_acpt2lan -m comment --comment "icmp0 all [ping]"
+

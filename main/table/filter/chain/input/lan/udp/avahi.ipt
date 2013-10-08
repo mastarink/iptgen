@@ -1,0 +1,8 @@
+#
+comment &
+
+rule dst($ipmdns) dpt(mdns) spt(mdns)
+cmp -A udpFlan -m udp -p udp --sport mdns -d 224.0.0.251 --dport mdns -j udp_acptFlan -m comment --comment avahi
+
+# 1007:113702 kernel: [161207.584456] TRACE: filter:dropFlan:return:1 IN=enp4s0 OUT= MAC= SRC=192.168.71.222 DST=224.0.0.251 LEN=66 TOS=0x00 PREC=0x00 TTL=255 ID=0 DF PROTO=UDP SPT=5353 DPT=5353 LEN=46 
+# 1007:113703 kernel: [161208.582668] TRACE: filter:dropFlan:return:1 IN=enp4s0 OUT= MAC= SRC=192.168.71.222 DST=224.0.0.251 LEN=66 TOS=0x00 PREC=0x00 TTL=255 ID=0 DF PROTO=UDP SPT=5353 DPT=5353 LEN=46
