@@ -1,0 +1,5 @@
+#
+comment for lan & @
+
+rule dpt(http)
+cmp -A tcp$chsuff -m tcp -p tcp            --dport http -j acpt$chsuff -m comment --comment "for lan http server"

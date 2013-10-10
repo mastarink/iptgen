@@ -1,15 +1,17 @@
 #
-# comment @
-
-chain @_acpt$chsuff @$chsuff
+chain @$chsuff
 proto @
-target @_acpt$chsuff
 
-include nmap ssh squid skype
-
-
-chain $chsuff
-rule target(@$chsuff)
+rule chain($chsuff) target(@$chsuff)
 cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
+# ------------------------------------------
+chain @$chsuff
 
-include acpt
+
+target acpt$chsuff
+
+include nmap ssh squid clients skype server/main
+
+
+
+# include acpt

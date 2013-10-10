@@ -7,13 +7,18 @@ target $chsuff
 rule comment(inputI)
 cmp -A INPUT -i enp2s0 -j $chsuff -m comment --comment inputI
 #----------------------------------------
+chain $chsuff
+
 output - ; input - 
-include acpt/main icmp/main tcp/main udp/main drop/main
+include drop/main
+
+include acpt/main icmp/main tcp/main udp/main
 
 chain drop$chsuff $chsuff
 target drop$chsuff
 
 rule
 cmp -A Finet -j dropFinet
+
 
 proto -

@@ -1,6 +1,0 @@
-chain acpt$chsuff icmp_acpt$chsuff
-
-rule target(ACCEPT) proto(-)
-cmp -A icmp_acptFlan -j ACCEPT
-# -A icmp_acptFlan -j ACCEPT
-

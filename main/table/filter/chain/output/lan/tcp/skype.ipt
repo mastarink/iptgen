@@ -3,12 +3,12 @@ comment &
 
 #skype
 #?? rule dpt($skype-port-range) comment(skype 1o)
-#?? cmp -A tcp2lan -m tcp -p tcp --dport 40000:49500  -j tcp_acpt2lan -m comment --comment "skype 1o"
+#?? cmp -A tcp2lan -m tcp -p tcp --dport 40000:49500  -j acpt2lan -m comment --comment "skype 1o"
 
 rule dpts($skype-incoming-ports) dst(mac.lan) comment(skype 2o)
-cmp -A tcp2lan -m tcp -p tcp -d 192.168.71.230 -m multiport --dports 46528,64231 -j tcp_acpt2lan -m comment --comment "skype 2o"
+cmp -A tcp2lan -m tcp -p tcp -d 192.168.71.230 -m multiport --dports 46528,64231 -j acpt2lan -m comment --comment "skype 2o"
 
 rule spts($skype-incoming-ports) dst(mac.lan) comment(skype 3o)
-cmp -A tcp2lan -m tcp -p tcp -m multiport --sports 46528,64231 -d 192.168.71.230 -j tcp_acpt2lan -m comment --comment "skype 3o"
+cmp -A tcp2lan -m tcp -p tcp -m multiport --sports 46528,64231 -d 192.168.71.230 -j acpt2lan -m comment --comment "skype 3o"
 
 

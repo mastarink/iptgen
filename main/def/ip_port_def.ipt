@@ -1,9 +1,13 @@
 ipinet=193.222.140.165
 iplan=192.168.71.0/24
 iplan-x=10.0.2.0/24,$iplan
-ipvbox=192.168.71.80/28
+
+# 192.168.71.192 - 192.168.71.223
+ipvbox=192.168.71.192/27
+
 # ipmoldova=188.244.26.74,188.244.26.91
 ipmdns=224.0.0.251
+ipigmp=224.0.0.22
 iplan-ping=$iplan-x
 iplan-nmap=$iplan-x
 # iplan-icmp=10.0.2.0/24,mac.lan,mike.lan

@@ -1,9 +1,9 @@
 #
 
 rule dst($ipmdns) src(mac.lan) spt(mdns) dpt(mdns)
-cmp -A udpFlan -m udp -p udp -s 192.168.71.230 --sport mdns -d 224.0.0.251 --dport mdns -j udp_acptFlan
+cmp -A udpFlan -m udp -p udp -s 192.168.71.230 --sport mdns -d 224.0.0.251 --dport mdns -j acptFlan
 
 rule dst($ipmdns) src(mac.lan) dpt(mdns)
-cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -d 224.0.0.251 --dport mdns -j udp_acptFlan
+cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -d 224.0.0.251 --dport mdns -j acptFlan
 
 

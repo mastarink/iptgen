@@ -1,5 +1,0 @@
-# servers
-rule dpt(http) comment(my http server)
-cmp -A tcp$chsuff -m tcp -p tcp -d $ipinet --dport http -j acpt$chsuff -m comment --comment "my http server"
-# -A tcpFinet $TCP_INET_IN_OPTS --dport http -j acptFinet -m comment --comment "my http server"
-

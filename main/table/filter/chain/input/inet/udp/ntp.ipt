@@ -2,4 +2,4 @@
 comment &
 
 rule  spt(&)
-cmp -A udp$chsuff -m udp -p udp --sport ntp -j udp_acpt$chsuff -m comment --comment ntp
+cmp -A udp$chsuff -m udp -p udp --sport ntp -j acpt$chsuff -m comment --comment ntp

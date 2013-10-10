@@ -1,6 +1,0 @@
-#
-chain @_acpt$chsuff
-target acpt$chsuff
-
-rule target(acpt$chsuff) proto(-)
-cmp -A tcp_acpt$chsuff  -j acpt$chsuff

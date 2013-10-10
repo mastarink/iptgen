@@ -1,0 +1,18 @@
+#
+chain acpt$chsuff @$chsuff
+proto @
+
+rule chain($chsuff) target(@$chsuff)
+cmp -A 2lan -p igmp -j igmp2lan
+#----------------------------------------
+
+target acpt$chsuff
+
+rule src($iplan) dst($ipigmp)
+cmp -A igmp2lan -p igmp -s $iplan -d 224.0.0.22 -j acpt2lan
+#----------------------------------------
+
+chain @$chsuff
+
+rule target(drop$chsuff)
+cmp -A igmp2lan -p igmp -j drop2lan

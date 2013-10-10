@@ -1,19 +1,16 @@
-  chain drop${chpref}ip_msft drop${chpref}ip_lstd drop${chpref}ip_bad drop${chpref}inet
-  target drop${chpref}ip_msft
+#
+  comment drop listed
+  target drop$chsuff
+
+  rule src(+badaddress)
+  cmp -A Finet -s +badaddress -j dropFinet -m comment --comment "drop listed"
+
   rule comment(drop-msft) src(+microsoft)
-  cmp -A drop$chsuff -s +microsoft -j drop${chpref}ip_msft -m comment --comment drop-msft
-  # -A dropFinet -s $MSFT_ADDRESS_LIST -m comment --comment drop-msft -j dropFip_msft
-
-
-  target drop${chpref}ip_lstd
-  
+  cmp -A Finet -s +microsoft -j dropFinet -m comment --comment drop-msft
+ 
   rule comment(other-droplist) src(+drop)
-  cmp -A drop$chsuff -s +drop -j drop${chpref}ip_lstd -m comment --comment other-droplist
-  # -A dropFinet -s $DROP_ADDRESS_LIST -m comment --comment other-droplist -j dropFip_lstd
+  cmp -A Finet -s +drop -j dropFinet -m comment --comment other-droplist
 
 
-  target drop${chpref}ip_bad ; rule comment(drop-bad) src(+bad)
-  cmp -A drop$chsuff -s 66.175.208.0/20,106.128.0.0/10 -j drop${chpref}ip_bad -m comment --comment drop-bad
-  # -A dropFinet -s $BAD_ADDRESS_LIST -m comment --comment drop-bad -j dropFip_bad
 
   target -

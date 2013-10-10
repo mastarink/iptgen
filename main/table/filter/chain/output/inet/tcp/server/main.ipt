@@ -1,0 +1,7 @@
+#
+comment for inet server
+ctstate RELATED,ESTABLISHED
+
+# src $ipinet
+
+include http

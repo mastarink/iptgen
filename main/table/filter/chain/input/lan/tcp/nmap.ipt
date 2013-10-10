@@ -2,4 +2,4 @@
 comment &
 
 rule src($iplan-x)
-cmp -A tcpFlan -m tcp -p tcp -s $iplan-x -j tcp_acptFlan -m comment --comment nmap
+cmp -A tcpFlan -m tcp -p tcp -s $iplan-x -j acptFlan -m comment --comment nmap

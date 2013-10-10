@@ -1,3 +1,19 @@
+#
+#       # sysctl net.netfilter.nf_log
+#       net.netfilter.nf_log.0 = NONE
+#       net.netfilter.nf_log.1 = NONE
+#       net.netfilter.nf_log.10 = ip6t_LOG
+#       net.netfilter.nf_log.11 = NONE
+#       net.netfilter.nf_log.12 = NONE
+#       net.netfilter.nf_log.2 = ipt_LOG
+#       net.netfilter.nf_log.3 = NONE
+#       net.netfilter.nf_log.4 = NONE
+#       net.netfilter.nf_log.5 = NONE
+#       net.netfilter.nf_log.6 = NONE
+#       net.netfilter.nf_log.7 = NONE
+#       net.netfilter.nf_log.8 = NONE
+#       net.netfilter.nf_log.9 = NONE
+
 table  begin raw
   policy OUTPUT PREROUTING ACCEPT
   target TRACE

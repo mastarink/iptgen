@@ -1,8 +1,8 @@
 #
 
 rule src($iplan-nmap) icmp-type(0) comment(icmp0 all [nmap])
-cmp -A icmpFlan -m icmp -p icmp --icmp-type 0 -s $iplan-nmap -j icmp_acptFlan -m comment --comment "icmp0 all [nmap]"
+cmp -A icmpFlan -m icmp -p icmp --icmp-type 0 -s $iplan-nmap -j acptFlan -m comment --comment "icmp0 all [nmap]"
 
 rule src($iplan-nmap) icmp-type(14) comment(icmp14 all [nmap])
-cmp -A icmpFlan -m icmp -p icmp --icmp-type 14 -s $iplan-nmap -j icmp_acptFlan -m comment --comment "icmp14 all [nmap]"
+cmp -A icmpFlan -m icmp -p icmp --icmp-type 14 -s $iplan-nmap -j acptFlan -m comment --comment "icmp14 all [nmap]"
 

@@ -1,13 +1,14 @@
 #
-chain udp_acpt$chsuff udp$chsuff
+chain acpt$chsuff udp$chsuff
 
 proto udp
 rule chain($chsuff) target(udp$chsuff)
 cmp -A $chsuff -m udp  -p udp   -j udp$chsuff
 # -----------------------------------------------
-target udp_acpt$chsuff
+target acpt$chsuff
 
-include domain mdns avahi dhcp nat-pmp samba skype acpt
+include domain mdns avahi dhcp nat-pmp samba skype
+# include acpt
 
 
 spt - ; dpt - ; comment - ; proto -

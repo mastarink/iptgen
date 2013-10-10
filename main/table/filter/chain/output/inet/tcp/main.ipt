@@ -1,24 +1,18 @@
 #
-chain drop$chsuff tcp$chsuff $chsuff
-proto tcp
+chain drop$chsuff  acpt$chsuff @$chsuff
+proto @
 
-rule target(tcp$chsuff)
+rule chain($chsuff) target(@$chsuff)
 cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
-
+#----------------------------------------
 target acpt$chsuff
 
-chain tcp$chsuff 
-rule dpts(xmpp-client,aol) comment(IM client)
-cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports xmpp-client,aol -j acpt2inet -m comment --comment "IM client"
-# rule gid-owner($gid-mastar-xmpp) dpts(xmpp-client,aol) comment(IM client)
-# cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports xmpp-client,aol -m owner --gid-owner 1073 -j acpt2inet -m comment --comment "IM client"
-# -A tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports xmpp-client,5050,aol  -j acpt2inet_nolog -m comment --comment "IM client"
 
 
-
-include nmap whois mail http radio gentoo github git/main skype
+include nmap whois im mail http radio gentoo github git/main skype server/main
 
 target drop$chsuff
 rule
 
-include acpt drop
+
+# include acpt drop

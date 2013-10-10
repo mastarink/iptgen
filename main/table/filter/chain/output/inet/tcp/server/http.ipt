@@ -1,0 +1,6 @@
+#
+comment for inet & @
+
+spts $http-ports
+rule 
+cmp -A tcp2inet -m tcp -p tcp -m multiport --sports http,https -m conntrack --ctstate RELATED,ESTABLISHED -j acpt2inet -m comment --comment "for inet http server"

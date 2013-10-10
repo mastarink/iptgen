@@ -40,8 +40,9 @@ my %resolved;
 my %targets_disabled;
 my %includes_disabled;
 my @errors;
+my @messages;
 my ($last_literal, $last_command, $cmp_disabled);
-my @basic_propset=qw/chain target output input proto dst src macdst macsrc dpt not-dpt spt not-spt ctstate uid-owner gid-owner icmp-type helper comment/;
+my @basic_propset=qw/chain target output input proto dst src macdst macsrc dpt not-dpt dpts spt not-spt spts ctstate uid-owner gid-owner icmp-type helper comment/;
 sub build_names;
 
 sub outerr
@@ -54,6 +55,8 @@ sub outerr
 sub outmsg
 {
   my ($code, @msg)=@_;
+  my $msg=[$#messages + 1, $code, join(' ', @msg), $current_build_file];
+  push @messages, $msg;
   printf save "#                        MSG : %03d: %s\n", $code, join(' ', @msg);
 }
 
@@ -138,7 +141,7 @@ sub make_address_array
 #       outmsg __LINE__, "IP file: $name";
 	if (-f $ipfname && open ipfile, $ipfname)
 	{
-	  my @iplines=<ipfile>;
+	  my @iplines=grep !/^\s*#/, <ipfile>;
 	  chomp @iplines;      
 	  close ipfile;
 #	  outmsg __LINE__,">>IP>> ( $ipfname ) -- ".join(';',@iplines);
@@ -153,6 +156,11 @@ sub make_address_array
 	  outerr __LINE__, "no file $ipfname";
 	}
       }
+    }
+    elsif ($address=~/^([\da-f]{2}:[\da-f]{2}:[\da-f]{2}:[\da-f]{2}:[\da-f]{2}:[\da-f]{2})$/i)
+    {
+      push @ips, $1;
+#     push @ips, split /\s*,\s*/, $1;
     }
     elsif ($address!~/^\d+\.\d+\.\d+\.\d+(\/\d+|)$/)
     { 
@@ -181,10 +189,15 @@ sub make_address_array
 sub ip_compare
 {
   my ($a,$b)=@_;
-  my $ip1 = new Net::IP ($a);
-  my $ip2 = new Net::IP ($b);
-# print '########## 1:',$ip1->ip(),'              2:',$ip2->ip()," CMP:",($ip1->intip() <=> $ip2->intip()),"\n";
-  return $ip1->intip() <=> $ip2->intip();
+  if ($a!~/:/ && $b!~/:/)
+  {
+    my $ip1 = new Net::IP ($a);
+    my $ip2 = new Net::IP ($b);
+  # print '########## 1:',$ip1->ip(),'              2:',$ip2->ip()," CMP:",($ip1->intip() <=> $ip2->intip()),"\n";
+    return $ip1->intip() <=> $ip2->intip();
+  }
+  else
+  {  return 0;  }
 }
 sub make_address
 {
@@ -502,6 +515,18 @@ sub make_command_target_ctl
     $targets_disabled{$_}=1 for (@command);
   }
 }
+sub make_command_each
+{
+  my ($level, @command)=@_;
+  my $subcmd=shift @command;
+  for my $mac (split(/\s*,\s*/, $subcmd))
+  {
+    my (@c)=@command;
+    s/\%/$mac/g for (@c);
+#   outerr __LINE__, "$mac --- ".join(',',@c);
+    make_command_array($level, \@c);
+  }
+}
 sub make_command_array
 {
   my ($level, $command)=@_;
@@ -537,6 +562,11 @@ sub make_command_array
     make_substitution $command;
     make_command_target_ctl @$command;
   }
+  elsif ($main eq 'each')
+  {
+    make_substitution $command;
+    make_command_each $level, @$command;
+  }
   elsif ($main eq 'off' || $main eq 'on') { make_command_onoff $main, @$command; }
   elsif ($main eq 'l-comment-off') { make_command_lcomment 'off', @$command; }
   elsif ($main eq 'l-comment-on')  { make_command_lcomment 'on', @$command; }
@@ -556,7 +586,7 @@ sub make_command_array
   elsif ($main eq 'wd' )
   {
     $workdir=shift @$command;
-#   outmsg __LINE__, ">>>>>>>>>>>>>>> [$workdir]";
+#   outmsg __LINE__, "WORKDIR [$workdir]";
   }
   elsif ($main eq 'target' 
   	|| $main eq 'proto'
@@ -568,8 +598,11 @@ sub make_command_array
 	|| $main eq 'mac-dst?'
 	|| $main eq 'spt'
 	|| $main eq 'not-spt'
+	|| $main eq 'spts'
 	|| $main eq 'dpt'
 	|| $main eq 'not-dpt'
+	|| $main eq 'dpts'
+	|| $main eq 'ctstate'
 	|| $main eq 'icmp-type'
 	|| $main eq 'uid-owner'
 	|| $main eq 'gid-owner'
@@ -685,27 +718,38 @@ sub build_iptables
   my ($level, $fname)=@_;
   $incdir="$confdir/main" if (!$incdir);
   my $conffile=$incdir;
-  $conffile.="/$workdir" if $workdir;
-  $conffile.="/$fname.ipt";
-  $current_build_file=$conffile;
-  $workdir='';
-  if ( -f "$conffile" )
+# outmsg __LINE__, "DIR $incdir";
+# outmsg __LINE__, "WORKDIR $incdir";
+# outmsg __LINE__, "NAME $fname";
+  unless (exists($includes_disabled{$fname}))
   {
-    if ($conffile=~/^(.*?)\/+([^\/]+)\.ipt$/)
-    { $incdir=$1; $thisname=$2; }
-    if ($incdir=~/^(.*?)\/+([^\/]+)$/)
-    {  $incname=$2;  }
+    $conffile.="/$workdir" if $workdir;
+    $conffile.="/$fname.ipt";
+    $current_build_file=$conffile;
+    $workdir='';
+  # outmsg __LINE__, "FILE $conffile";
+    if ( -f "$conffile" )
+    {
+      if ($conffile=~/^(.*?)\/+([^\/]+)\.ipt$/)
+      { $incdir=$1; $thisname=$2; }
+      if ($incdir=~/^(.*?)\/+([^\/]+)$/)
+      {  $incname=$2;  }
+      else
+      { $incname=$incdir; }
+  #   outmsg __LINE__, "$incdir -- $workdir -- $incname -- $thisname";
+  ##  outmsg __LINE__, "$incdir / $workdir @ $conffile";
+  ##  outmsg __LINE__, "$conffile exists";
+      outlog __LINE__, "$conffile exists";
+      make_file $level, $conffile;
+    }
     else
-    { $incname=$incdir; }
-#   outmsg __LINE__, "$incdir -- $workdir -- $incname -- $thisname";
-##  outmsg __LINE__, "$incdir / $workdir @ $conffile";
-##  outmsg __LINE__, "$conffile exists";
-    outlog __LINE__, "$conffile exists";
-    make_file $level, $conffile;
+    {
+      outerr __LINE__, "$conffile not exists ($fname)";
+    }
   }
   else
   {
-    outerr __LINE__, "$conffile not exists ($fname)";
+    outmsg __LINE__, "DISABLED include $incdir/$fname";
   }
 }
 
@@ -738,6 +782,7 @@ sub save_context
   $saved->{current_chain}=$chain;
   $saved->{workdir}=$workdir;
   $saved->{incdir}=$incdir;
+  $saved->{incname}=$incname;
   $saved->{current_build_file}=$current_build_file;
 #     outmsg __LINE__, "PUSH chain $chain";
   for my $prop (@basic_propset)
@@ -754,6 +799,7 @@ sub restore_context
   $chain=$saved->{current_chain};
   $workdir=$saved->{workdir};
   $incdir=$saved->{incdir};
+  $incname=$saved->{incname};
   $current_build_file=$saved->{current_build_file};
   if ($chain)
   {
@@ -772,22 +818,15 @@ sub build_names
   {
     for my $name (@names)
     {
-      unless (exists($includes_disabled{$name}))
+      save_context;
       {
-	save_context;
-	{
-	  if ( $output_namecomment >0 ) { output_literal "# ++++++++++++++++++++++++++++++++++++++ name: $name"; }
-	  printf STDERR "> [%".($level*3)."s] ------\r", ${name};
-	  build_iptables $level, $name;
-	  printf STDERR "< [%".($level*3)."s] ------\r", ${name};
-	  if ( $output_namecomment >0 ) { output_literal "# -------------------------------------- name: $name"; }
-	}
-	restore_context;
+	if ( $output_namecomment >0 ) { output_literal "# ++++++++++++++++++++++++++++++++++++++ name: $name"; }
+	printf STDERR "> [%".($level*3)."s] ------\r", ${name};
+	build_iptables $level, $name;
+	printf STDERR "< [%".($level*3)."s] ------\r", ${name};
+	if ( $output_namecomment >0 ) { output_literal "# -------------------------------------- name: $name"; }
       }
-      else
-      {
-        outmsg __LINE__, "DISABLED include $name";
-      }
+      restore_context;
     } 
   }
 }
@@ -817,14 +856,14 @@ sub main
 	{
 	  while(<loadopts>)
 	  {
-	    if (/^\s*(\w+)\s*:\s*(\w*)\s*$/)
+	    if (/^\s*([\w\-\/]+)\s*:\s*(\w*)\s*$/)
 	    {
 	      my $id=$1;
 	      my $opt=$2;
 	      if ($opt eq 'off')
 	      {
 	        $includes_disabled{$id}=1;
-		outmsg __LINE__, "DISABLING include $id";
+		outmsg __LINE__, "DISABLING include '$id'";
 	      }
 	      elsif ($opt eq 'on')
 	      {
@@ -898,6 +937,14 @@ sub main
     close tocat;
   }
   {
+    print STDERR "\n\n#-------------------------\n";
+    if ($#messages >= 0)
+    {
+      print STDERR "\n\n@@ >>>>>>>>> ".($#messages+1)." MESSAGES <<<<<<<<<<<<\n\n";
+      for my $msg (@messages)
+      { printf STDERR "@@ --- (%3d) MSG : %03d: %s\n", @$msg; }
+#     { printf STDERR "@@ --- (%3d) MSG : %03d: %s\n\n@@ >> AT file %-s\n\n", @$msg; }
+    }
     print STDERR "\n\n#-------------------------\n";
     if ($#errors >= 0)
     {

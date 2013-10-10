@@ -2,3 +2,4 @@ sopcast : off
 log : off
 nmap : off
 # ping : off
+# server/main : off

@@ -1,0 +1,7 @@
+#
+comment for lan & @
+
+spts $http-ports
+rule
+cmp -A tcp2lan  -m tcp -p tcp -m multiport --sports http,https -m conntrack --ctstate RELATED,ESTABLISHED -j acpt2lan  -m comment --comment "for lan http server"
+

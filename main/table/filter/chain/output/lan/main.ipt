@@ -8,7 +8,9 @@ rule comment(outputA)
 cmp -A OUTPUT -o enp4s0 -j $chsuff -m comment --comment outputA
 #----------------------------------------
 output - ; input - 
-include acpt/main icmp/main tcp/main udp/main drop/main vbox
+
+include acpt/main 
+include icmp/main tcp/main udp/main igmp/main drop/main vbox
 
 chain drop$chsuff $chsuff
 target drop$chsuff

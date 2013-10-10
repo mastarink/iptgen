@@ -1,13 +1,18 @@
 #
-chain @_acpt$chsuff @$chsuff
+chain drop$chsuff  acpt$chsuff @$chsuff
 proto @
-target tcp_acpt$chsuff
 
-include domain nmap squid ssh skype
-
-
-chain $chsuff
-rule target(@$chsuff)
+rule chain($chsuff) target(@$chsuff)
 cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
+#----------------------------------------
+target acpt$chsuff
 
-include acpt
+
+
+include domain nmap http squid ssh skype server/main
+
+target drop$chsuff
+rule
+
+
+# include acpt

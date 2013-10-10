@@ -2,4 +2,4 @@
 comment &
 
 rule  dpt(&)
-cmp -A udp$chsuff -m udp -p udp --dport ntp -j udp_acpt$chsuff -m comment --comment ntp
+cmp -A udp2inet -m udp -p udp --dport ntp -j acpt2inet -m comment --comment ntp

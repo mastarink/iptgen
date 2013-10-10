@@ -1,25 +1,22 @@
 #
 comment @
 proto @
-chain @_acpt$chsuff @$chsuff
+chain acpt$chsuff @$chsuff
 
 rule chain($chsuff) target(@$chsuff)
 cmp -A $chsuff -m udp  -p udp   -j udp$chsuff -m comment --comment udp
-
 # -----------------------------------------------
-chain @$chsuff
-target @_acpt$chsuff
+target acpt$chsuff
 
 
-chain @$chsuff 
 rule gid-owner($gid-mastar-xmpp) dpt($ssdp_port) comment(IM client/SSDP)
-cmp -A udp2inet -m udp -p udp --dport 1900 -m owner --gid-owner 1073 -j udp_acpt2inet -m comment --comment "IM client/SSDP"
+cmp -A udp2inet -m udp -p udp --dport 1900 -m owner --gid-owner 1073 -j acpt2inet -m comment --comment "IM client/SSDP"
 
 include ntp domain skype sopcast
 
 spt - ; dpt -
 
-include acpt
+# include acpt
 
 comment -
 

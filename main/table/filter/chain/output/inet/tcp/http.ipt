@@ -1,9 +1,10 @@
-chain http$chsuff tcp$chsuff
+#
+chain &$chsuff @$chsuff
 
-rule dpts($http-portsx) target(http$chsuff)
+rule dpts($http-portsx) target(&$chsuff)
 cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports http,https,8080 -j http2inet
 # ------------------------------------
-chain http$chsuff
+chain &$chsuff
 
 #-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1067  -j acpt2ihttp -m comment --comment "http gid mastar-browser"
 #-A http2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1024  -j acpt2ihttp -m comment --comment "http gid mastar-http"

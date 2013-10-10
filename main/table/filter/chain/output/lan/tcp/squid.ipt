@@ -2,5 +2,5 @@
 comment &
 
 rule src(proxy.mastar.lan) spt($squid_port)
-cmp -A tcp2lan -m tcp -p tcp -s 192.168.71.11 --sport 3128 -j tcp_acpt2lan -m comment --comment squid
-# -A tcp_acpt2lan -m tcp -p tcp --sport $SQUID_PORT -s $PROXY_LAN_ADDRESS -j ACCEPT
+cmp -A tcp2lan -m tcp -p tcp -s 192.168.71.11 --sport 3128 -j acpt2lan -m comment --comment squid
+# -A acpt2lan -m tcp -p tcp --sport $SQUID_PORT -s $PROXY_LAN_ADDRESS -j ACCEPT

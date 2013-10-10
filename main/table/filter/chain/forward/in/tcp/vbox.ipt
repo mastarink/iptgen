@@ -1,0 +1,7 @@
+#
+comment vbox
+
+#for vbox
+rule dst($ipvbox) spts($http-ports) ctstate(RELATED,ESTABLISHED)
+cmp -A tcpWin -m tcp -p tcp -m multiport --sports http,https -d 192.168.71.192/27 -m conntrack --ctstate RELATED,ESTABLISHED -j acptWin -m comment --comment vbox
+

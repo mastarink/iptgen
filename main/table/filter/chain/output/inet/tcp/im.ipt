@@ -1,0 +1,9 @@
+#
+chain tcp$chsuff 
+rule dpts(xmpp-client,aol) comment(IM client)
+cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports xmpp-client,aol -j acpt2inet -m comment --comment "IM client"
+
+# rule gid-owner($gid-mastar-xmpp) dpts(xmpp-client,aol) comment(IM client)
+# cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports xmpp-client,aol -m owner --gid-owner 1073 -j acpt2inet -m comment --comment "IM client"
+# -A tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports xmpp-client,5050,aol  -j acpt2inet_nolog -m comment --comment "IM client"
+

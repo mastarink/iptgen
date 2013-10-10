@@ -1,12 +1,12 @@
 #
-chain @_acpt$chsuff @$chsuff
+chain acpt$chsuff @$chsuff
 proto @
 
 rule chain($chsuff) target(@$chsuff) icmp-type(any)
 cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
 #----------------------------------------
 
-target @_acpt$chsuff
+target acpt$chsuff
 
 include nmap ping
 
@@ -16,4 +16,4 @@ chain drop$chsuff @$chsuff
 rule target(drop$chsuff) proto(-)
 cmp -A icmpFlan -j dropFlan
 
-include acpt
+# include acpt

@@ -1,0 +1,7 @@
+#
+rule spt($skype-port-range) dst(mac.lan) comment(skype-fw 1i)
+cmp -A tcpWin -m tcp -p tcp  --sport 40000:49500  -d 192.168.71.230 -j acptWin -m comment --comment "skype-fw 1i"
+
+rule spts($skype-incoming-ports) dst(mac.lan) comment(skype-fw 1i)
+cmp -A tcpWin -m tcp -p tcp -m multiport --sports 46528,64231 -d 192.168.71.230 -j acpt$chsuff -m comment --comment "skype-fw 1i"
+

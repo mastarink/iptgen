@@ -1,0 +1,12 @@
+#
+comment wifi
+
+# google (android etc.)
+rule dpts($http-ports) dst(+google) src(mac.lan)
+cmp -A tcpWout -m tcp -p tcp -s 192.168.71.230 -d 74.125.0.0/16,173.194.0.0/16,216.239.32.0/19 -m multiport --dports http,https -j acptWout -m comment --comment wifi
+
+# for (android etc.)
+rule dpts($http-ports)
+cmp -A tcpWout -m tcp -p tcp -m multiport --dports http,https -j acptWout -m comment --comment wifi
+
+

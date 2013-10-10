@@ -1,27 +1,16 @@
 #
-chain @_acpt$chsuff @$chsuff
+chain acpt$chsuff @$chsuff
 proto @
 
 rule chain($chsuff) target(@$chsuff)
 cmp -A Flan -p igmp -j igmpFlan
 #----------------------------------------
 
-target @_acpt$chsuff
+target acpt$chsuff
 
 rule src($iplan)
-cmp -A igmpFlan -p igmp -s $iplan -j igmp_acptFlan
+cmp -A igmpFlan -p igmp -s $iplan -j acptFlan
 
-#----------------------------------------
-chain @_acpt$chsuff
-
-rule target(acpt$chsuff)
-cmp -A igmp_acptFlan -p igmp -j acptFlan
-#----------------------------------------
-
-chain @_drop$chsuff
-
-rule target(drop$chsuff)
-cmp -A igmp_dropFlan -p igmp -j dropFlan
 #----------------------------------------
 
 chain @$chsuff

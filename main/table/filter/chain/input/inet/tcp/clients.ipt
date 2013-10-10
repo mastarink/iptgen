@@ -1,13 +1,11 @@
-# clients
+# 
+comment clients
+
 rule ctstate(RELATED,ESTABLISHED)
-cmp -A tcp$chsuff -m tcp -p tcp -d $ipinet -m conntrack --ctstate RELATED,ESTABLISHED -j acpt$chsuff
+cmp -A tcp$chsuff -m tcp -p tcp -d $ipinet -m conntrack --ctstate RELATED,ESTABLISHED -j acpt$chsuff -m comment --comment clients
 # -A tcpFinet $TCP_INET_IN_OPTS -m conntrack --ctstate RELATED,ESTABLISHED -j acptFinet
 
-rule spts($http-portsx)
-cmp -A tcp$chsuff -m tcp -p tcp -m multiport --sports http,https,8080 -d $ipinet -j acpt$chsuff
-# -A tcpFinet $TCP_INET_IN_OPTS -m multiport --sports $HTTP_PORTS           -j acptFinet
-
 rule spts($im_ports)
-cmp -A tcp$chsuff -m tcp -p tcp -m multiport --sports xmpp-client,5050,aol -d $ipinet -j acpt$chsuff
+cmp -A tcp$chsuff -m tcp -p tcp -m multiport --sports xmpp-client,5050,aol -d $ipinet -j acpt$chsuff -m comment --comment clients
 # -A tcpFinet $TCP_INET_IN_OPTS -m multiport --sports xmpp-client,5050,aol -j acptFinet
 

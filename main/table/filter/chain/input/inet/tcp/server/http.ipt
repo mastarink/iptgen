@@ -1,0 +1,5 @@
+#
+comment for inet & @
+
+rule dpt(http)
+cmp -A tcp$chsuff -m tcp -p tcp -d $ipinet --dport http -j acpt$chsuff -m comment --comment "for inet http server"

@@ -1,12 +1,12 @@
 #
 
-# -A udpFlan -m udp -p udp     -s $MAC_LAN_ADDRESS -d $INET_IP -m multiport --sports 64231,51634,36493,63700  -j udp_acptFlan -m comment --comment skype
-# -A udpFlan -m udp -p udp -s $MAC_LAN_ADDRESS  -d $INET_IP -m multiport --dports 64231,51634,36493,63700     -j udp_acptFlan -m comment --comment skype
-# -A udpFlan -m udp -p udp -s $MAC_LAN_ADDRESS,10.0.2.0/24 --dport 46528					    -j udp_acptFlan -m comment --comment skype
+# -A udpFlan -m udp -p udp     -s $MAC_LAN_ADDRESS -d $INET_IP -m multiport --sports 64231,51634,36493,63700  -j acptFlan -m comment --comment skype
+# -A udpFlan -m udp -p udp -s $MAC_LAN_ADDRESS  -d $INET_IP -m multiport --dports 64231,51634,36493,63700     -j acptFlan -m comment --comment skype
+# -A udpFlan -m udp -p udp -s $MAC_LAN_ADDRESS,10.0.2.0/24 --dport 46528					    -j acptFlan -m comment --comment skype
 
 rule spts($skype-incoming-ports) src(mac.lan) comment(skype 1i)
-cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -m multiport --sports 46528,64231 -j udp_acptFlan -m comment --comment "skype 1i"
+cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -m multiport --sports 46528,64231 -j acptFlan -m comment --comment "skype 1i"
 
 rule dpts($skype-incoming-ports) src(mac.lan) comment(skype 2i)
-cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -m multiport --dports 46528,64231 -j udp_acptFlan -m comment --comment "skype 2i"
+cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -m multiport --dports 46528,64231 -j acptFlan -m comment --comment "skype 2i"
 

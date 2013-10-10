@@ -7,9 +7,9 @@ cmp -A udp$chsuff -m udp  -p udp -j skype_udp$chsuff -m comment --comment skype
 #----------------------------------------
 
 rule gid-owner($gid-mastar-skype) dpt($skype-x_port)
-cmp -A skype_udp$chsuff -m udp -p udp --dport $skype-x_port -m owner --gid-owner $gid-mastar-skype -j udp_acpt2inet -m comment --comment skype
+cmp -A skype_udp$chsuff -m udp -p udp --dport $skype-x_port -m owner --gid-owner $gid-mastar-skype -j acpt2inet -m comment --comment skype
 
 rule spts($skype-incoming-ports) src($ipinet) comment(& 1o)
-cmp -A skype_udp2inet -m udp -p udp -s 193.222.140.165 -m multiport --sports 46528,64231 -j udp_acpt2inet -m comment --comment "skype 1o"
+cmp -A skype_udp2inet -m udp -p udp -s 193.222.140.165 -m multiport --sports 46528,64231 -j acpt2inet -m comment --comment "skype 1o"
 
 

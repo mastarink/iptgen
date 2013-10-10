@@ -1,0 +1,5 @@
+#
+comment clients
+
+rule ctstate(RELATED,ESTABLISHED)
+cmp -A tcp$chsuff -m tcp -p tcp -m conntrack --ctstate RELATED,ESTABLISHED -j acpt$chsuff -m comment --comment clients

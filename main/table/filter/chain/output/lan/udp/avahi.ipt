@@ -2,5 +2,5 @@
 comment &
 
 rule  uid-owner($uid-avahi) gid-owner($gid-avahi) spt(mdns) dpt(mdns) dst($ipmdns)
-cmp -A udp2lan -m udp -p udp --sport mdns -d 224.0.0.251 --dport mdns -m owner --uid-owner 107 --gid-owner 996 -j udp_acpt2lan -m comment --comment avahi
+cmp -A udp2lan -m udp -p udp --sport mdns -d 224.0.0.251 --dport mdns -m owner --uid-owner 107 --gid-owner 996 -j acpt2lan -m comment --comment avahi
 

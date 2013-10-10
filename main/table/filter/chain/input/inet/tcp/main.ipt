@@ -1,19 +1,17 @@
 #
-chain @$chsuff $chsuff
+chain @$chsuff
 proto @
 
-rule target(@$chsuff)
+rule chain($chsuff) target(@$chsuff)
 cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
 # ------------------------------------------
-chain drop$chsuff acpt$chsuff ask_rtmp @$chsuff
+chain @$chsuff
 dst $ipinet
 
 target acpt$chsuff
 
-include rtmp gentoo servers clients skype
+include rtmp gentoo    clients skype server/main
 
-target drop$chsuff
 include listed_ports
 
-rule proto(-) dst(-)
-cmp -A tcpFinet -j dropFinet
+# include acpt

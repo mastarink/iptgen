@@ -1,13 +1,9 @@
 #
-  chain drop$chsuff $chsuff
-  
-  rule target(drop$chsuff)
-  cmp -A $chsuff -j drop$chsuff
+  chain @$chsuff $chsuff
 
-  chain drop$chsuff
+  include listed log
 
-# include listed
-include log
+  chain @$chsuff
 
   target DROP ; rule
-  cmp -A drop$chsuff -j DROP
+  cmp -A drop2inet -j DROP

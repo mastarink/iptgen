@@ -1,0 +1,6 @@
+#
+comment vbox
+
+rule dst($ipvbox) dpts($http-ports)
+cmp -A tcpWout -m tcp -p tcp -d 192.168.71.192/27 -m multiport --dports http,https -j acptWout -m comment --comment vbox
+

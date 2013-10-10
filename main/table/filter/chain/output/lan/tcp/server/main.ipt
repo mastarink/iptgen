@@ -1,0 +1,7 @@
+#
+comment for lan server
+ctstate RELATED,ESTABLISHED
+
+include http
+
+

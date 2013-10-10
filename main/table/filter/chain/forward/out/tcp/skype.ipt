@@ -1,0 +1,7 @@
+#
+comment skype
+
+rule dpt($skype-port-range) src(mac.lan) comment(skype-fw 2o)
+cmp -A tcpWout -m tcp -p tcp  -s 192.168.71.230 --dport 40000:49500  -j acptWout -m comment --comment "skype-fw 2o"
+
+

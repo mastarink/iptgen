@@ -1,0 +1,18 @@
+#
+chain &$chsuff @$chsuff
+
+rule dpts($http-portsx) target(&$chsuff)
+cmp -A tcp2lan -m tcp  -p tcp -m multiport --dports http,https,8080 -j http2lan
+# ------------------------------------
+chain &$chsuff
+
+
+
+
+# rule
+# cmp -A http2lan -m tcp -p tcp -j acpt2lan 
+
+target drop$chsuff
+
+rule
+cmp -A http2lan -m tcp -p tcp -j drop2lan

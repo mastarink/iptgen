@@ -7,8 +7,12 @@ target $chsuff
 rule comment(outputI)
 cmp -A OUTPUT -o enp2s0 -j 2inet -m comment --comment outputI
 #----------------------------------------
+chain $chsuff
+
 output - ; input - 
-include acpt/main icmp/main tcp/main udp/main drop/main
+include drop/main
+
+include acpt/main icmp/main tcp/main udp/main
 
 chain drop$chsuff $chsuff
 target drop$chsuff
