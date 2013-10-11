@@ -17,5 +17,4 @@
 # rule proto(icmp) icmp-type(any)
 # rule proto(icmp) icmp-type(any)
 #------------------------------------------------------------
-  rule
-  cmp -A OUTPUT -j TRACE
+  include trace

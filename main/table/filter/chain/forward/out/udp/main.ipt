@@ -1,7 +1,8 @@
 #
 comment @ / fw / out
-proto @
 chain @$chsuff
+
+proto @
 
 rule chain($chsuff) target(@$chsuff)
 cmp -A Wout -m udp -p udp -j udpWout -m comment --comment "udp / fw / out"
@@ -9,3 +10,8 @@ cmp -A Wout -m udp -p udp -j udpWout -m comment --comment "udp / fw / out"
 target acpt$chsuff
 
 include ntp skype
+
+target drop$chsuff
+
+rule comment(for TRACE)
+cmp -A udpWout -m udp -p udp -j dropWout -m comment --comment "for TRACE"

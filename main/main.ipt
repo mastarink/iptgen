@@ -2,7 +2,7 @@ l-comment off
 name-comment off
 empty-lines off
 defaut_policy=DROP
-chsuff=${chpref}$log-direction
+chsuff=${chpref}$direction
 ;
 wd def
 include log_def if_def ip_port_def group_def

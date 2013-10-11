@@ -22,6 +22,7 @@ use Net::IP;
 my $current_build_file;
 
 my $incdir;
+my $upname;
 my $incname;
 my $thisname;
 my $workdir;
@@ -42,7 +43,7 @@ my %includes_disabled;
 my @errors;
 my @messages;
 my ($last_literal, $last_command, $cmp_disabled);
-my @basic_propset=qw/chain target output input proto dst src macdst macsrc dpt not-dpt dpts spt not-spt spts ctstate uid-owner gid-owner icmp-type helper comment/;
+my @basic_propset=qw/chain target interface output input proto dst src macdst macsrc dpt not-dpt dpts spt not-spt spts ctstate uid-owner gid-owner icmp-type helper comment/;
 sub build_names;
 
 sub outerr
@@ -225,6 +226,7 @@ sub make_substitutionz
     $subs=0;
     for (@$command)
     {
+      $subs++      if (s/\^/$upname/);
       $subs++      if (s/@/$incname/);
       $subs++      if (s/&/$thisname/);
     }
@@ -500,7 +502,7 @@ sub make_command_cmp
 # outmsg __LINE__, join(' ', @command);
   if (!$cmp_disabled && "$last_command" ne "$this_command")
   {
-    outerr __LINE__, "-- cmp FAIL: --L(".length($last_command).'/'.length($this_command).")", "\n       $last_command", "\n       $this_command";
+    outerr __LINE__, "-- cmp FAIL: --L(".length($last_command).'/'.length($this_command).")", "\n#       $last_command", "\n#       $this_command";
   }
   undef $last_command;
   undef $cmp_disabled;
@@ -526,6 +528,15 @@ sub make_command_each
 #   outerr __LINE__, "$mac --- ".join(',',@c);
     make_command_array($level, \@c);
   }
+}
+sub make_command_interface
+{
+  my (@command)=@_;
+  my $v=join(' ', @command);
+  if (exists($variables{'in_out'}))
+  { $tables{$current_table}{$variables{'in_out'}}=$v; }
+  else
+  { outerr __LINE__, "to use 'interface' variable 'in_out' should be set : ",join(',',sort keys %variables); }
 }
 sub make_command_array
 {
@@ -566,6 +577,11 @@ sub make_command_array
   {
     make_substitution $command;
     make_command_each $level, @$command;
+  }
+  elsif ($main eq 'interface')
+  {
+    make_substitution $command;
+    make_command_interface @$command;
   }
   elsif ($main eq 'off' || $main eq 'on') { make_command_onoff $main, @$command; }
   elsif ($main eq 'l-comment-off') { make_command_lcomment 'off', @$command; }
@@ -731,8 +747,14 @@ sub build_iptables
     if ( -f "$conffile" )
     {
       if ($conffile=~/^(.*?)\/+([^\/]+)\.ipt$/)
-      { $incdir=$1; $thisname=$2; }
-      if ($incdir=~/^(.*?)\/+([^\/]+)$/)
+      { 
+        $incdir=$1;
+	$thisname=$2;
+      }
+      $upname='';
+      if ($incdir=~/^(.*?)\/+([^\/]+)\/+([^\/]+)$/)
+      {  $upname=$2; $incname=$3;  }
+      elsif ($incdir=~/^(.*?)\/+([^\/]+)$/)
       {  $incname=$2;  }
       else
       { $incname=$incdir; }
@@ -782,6 +804,7 @@ sub save_context
   $saved->{current_chain}=$chain;
   $saved->{workdir}=$workdir;
   $saved->{incdir}=$incdir;
+  $saved->{upname}=$upname;
   $saved->{incname}=$incname;
   $saved->{current_build_file}=$current_build_file;
 #     outmsg __LINE__, "PUSH chain $chain";
@@ -799,6 +822,7 @@ sub restore_context
   $chain=$saved->{current_chain};
   $workdir=$saved->{workdir};
   $incdir=$saved->{incdir};
+  $upname=$saved->{upname};
   $incname=$saved->{incname};
   $current_build_file=$saved->{current_build_file};
   if ($chain)

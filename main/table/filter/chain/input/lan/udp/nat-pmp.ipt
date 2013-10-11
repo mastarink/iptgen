@@ -1,7 +1,8 @@
 #
-#NAT-PMP
+comment & ^
+
 rule dpt($nat-pmp_port) dst(back.mastar.lan) src(mac.lan)
-cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -d 192.168.71.2 --dport 5351 -j acptFlan
+cmp -A udpFlan -m udp -p udp -s 192.168.71.230 -d 192.168.71.2 --dport 5351 -j acptFlan -m comment --comment "nat-pmp lan"
 # TRACE: filter:dropFlan:rule:1 IN=enp4s0 OUT= MAC=00:00:1c:d3:d6:ad:00:14:51:3b:57:8c:08:00 SRC=192.168.71.230 DST=192.168.71.2 LEN=40 TOS=0x00 PREC=0x00 TTL=64 ID=22598 PROTO=UDP SPT=49637 DPT=5351 LEN=20 
 
 

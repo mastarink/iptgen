@@ -1,5 +1,5 @@
 #
-chain @$chsuff
+chain drop$chsuff @$chsuff
 
 proto @
 
@@ -9,3 +9,11 @@ cmp -A Win -m tcp -p tcp -j tcpWin
 target acpt$chsuff
 
 include skype wifi vbox
+
+
+
+
+target drop$chsuff
+
+rule comment(for TRACE)
+cmp -A tcpWin -m tcp -p tcp -j dropWin -m comment --comment "for TRACE"

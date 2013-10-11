@@ -1,6 +1,4 @@
 #
   log-message=$log-drop-message
   rule target(LOG) $log-options
-  cmp -A drop$chsuff -j LOG --log-prefix "ipt4: NOT $log-way $log-direction" --log-uid $log-xoptions --log-level 7
-  # -A dropFlocal -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK $log-way local " $IPTABLES_LOG_OPTS
-
+  cmp -A drop$chsuff -j LOG --log-prefix "ipt4: NOT $log-way $direction" --log-uid $log-xoptions --log-level 7 -m comment --comment "input local"

@@ -1,5 +1,5 @@
 #
-log-direction=@
+direction=@
 
 output $ifinet ; input $iflan
 target $chsuff

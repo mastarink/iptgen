@@ -1,6 +1,5 @@
 #
+comment & ^
 
 rule  dpt(domain)
-cmp -A udp$chsuff -m udp -p udp --dport domain -j acpt$chsuff
-# -A udpFlan -m udp -p udp --dport domain -j acptFlan
-
+cmp -A udp$chsuff -m udp -p udp --dport domain -j acpt$chsuff -m comment --comment "domain lan"

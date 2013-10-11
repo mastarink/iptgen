@@ -1,9 +1,11 @@
 #
-proto @
 chain drop$chsuff @$chsuff
+proto @
 
-rule chain($chsuff) target(@$chsuff) @-type(any)
+icmp-type any
+rule chain($chsuff) target(@$chsuff)
 cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
+#----------------------------------------
 
 target acpt$chsuff
 
@@ -13,5 +15,5 @@ icmp-type -
 proto -
 
 target drop$chsuff
-rule
-cmp -A icmpFinet -j dropFinet
+rule comment(for TRACE)
+cmp -A icmpFinet  -j dropFinet -m comment --comment "for TRACE"

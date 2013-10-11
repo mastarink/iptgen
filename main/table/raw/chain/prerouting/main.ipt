@@ -14,6 +14,4 @@
   rule input($iflocal) target(ACCEPT)
   cmp -A PREROUTING -i lo -j ACCEPT
 #------------------------------------------------------------
-  rule 
-  cmp -A PREROUTING -j TRACE
-
+  include trace

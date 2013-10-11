@@ -1,13 +1,6 @@
 #
   chain drop$chsuff $chsuff
- 
-# why ???
-  rule target(drop$chsuff)
-  cmp -A $chsuff -j drop$chsuff
 
   chain drop$chsuff
 
 include log
-  
-  target DROP ; rule
-  cmp -A drop$chsuff -j DROP

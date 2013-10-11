@@ -1,9 +1,9 @@
 log-level=7
 log-ipt-pref=ipt4
 log-plus=
-log-drop-msg=$log-not-mark $log-way $log-direction$log-plus
+log-drop-msg=$log-not-mark $log-way $direction$log-plus
 log-drop-message=$log-ipt-pref: $log-drop-msg
-log-accept-msg=$log-yes-mark $log-way $log-direction$log-plus
+log-accept-msg=$log-yes-mark $log-way $direction$log-plus
 log-accept-message=$log-ipt-pref: $log-accept-msg
 log-yes-mark=YES
 log-not-mark=NOT

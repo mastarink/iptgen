@@ -1,11 +1,13 @@
 #
-log-direction=@
+comment ^ @
 
-input $if@
+direction=@
+
+interface $if@
 target $chsuff
 
-rule comment(inputO)
-cmp -A INPUT -i lo -j $chsuff -m comment --comment inputO
+rule comment($in_out local)
+cmp -A INPUT -i lo -j $chsuff -m comment --comment "input local"
 #----------------------------------------
 output - ; input - 
 include acpt/main icmp/main tcp/main udp/main drop/main
@@ -13,8 +15,5 @@ include acpt/main icmp/main tcp/main udp/main drop/main
 chain drop$chsuff $chsuff
 target drop$chsuff
 
-rule
-cmp -A Flocal -j dropFlocal
-
-
-proto -
+rule comment(for TRACE)
+cmp -A Flocal -j dropFlocal -m comment --comment "for TRACE"

@@ -1,9 +1,0 @@
-#
-  chain @$chsuff $chsuff
-  
-  include listed log
-
-  chain @$chsuff
-
-  target DROP ; rule
-  cmp -A dropFinet -j DROP

@@ -15,5 +15,5 @@ icmp-type -
 proto -
 
 target drop$chsuff
-rule
-cmp -A icmp2inet -j drop2inet
+rule comment(for TRACE)
+cmp -A icmp2inet  -j drop2inet -m comment --comment "for TRACE"

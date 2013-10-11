@@ -1,19 +1,17 @@
 #
-chain tcp$chsuff $chsuff
+comment @ ^
+
+chain @$chsuff
 
 
-rule target(tcp$chsuff) proto(tcp)
-cmp -A $chsuff -m tcp  -p tcp -j tcp$chsuff
-
-chain tcp$chsuff
-
+rule chain($chsuff) target(@$chsuff) proto(@)
+cmp -A $chsuff -m tcp  -p tcp -j tcp$chsuff -m comment --comment "tcp local"
+#----------------------------------------
 rule target(acpt$chsuff)
-cmp -A tcp$chsuff -j acpt$chsuff
-# -A tcp2local -i $LO_IFACE -j acptFlocal
+cmp -A tcp$chsuff -j acpt$chsuff -m comment --comment "tcp local"
 
+target drop$chsuff
 chain drop$chsuff tcp$chsuff
-rule target(drop$chsuff)
-cmp -A tcp$chsuff -j drop$chsuff
-# -A tcp2local -j drop2$chsuff
 
-
+rule comment(for TRACE)
+cmp -A tcp$chsuff -j drop2local -m comment --comment "for TRACE"

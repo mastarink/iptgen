@@ -1,9 +1,11 @@
 #
-chain drop$chsuff  acpt$chsuff @$chsuff
+comment @ ^
+
+chain drop$chsuff acpt$chsuff @$chsuff
 proto @
 
 rule chain($chsuff) target(@$chsuff)
-cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
+cmp -A 2lan -m tcp  -p tcp   -j tcp2lan  -m comment --comment "tcp lan"
 #----------------------------------------
 target acpt$chsuff
 
@@ -12,7 +14,3 @@ target acpt$chsuff
 include domain nmap http squid ssh skype server/main
 
 target drop$chsuff
-rule
-
-
-# include acpt

@@ -2,6 +2,4 @@
   comment drop listed
   target drop$chsuff
 
-  rule dst(+badaddress)
-  cmp -A 2inet -d +badaddress -j drop2inet -m comment --comment "drop listed"
-  
+

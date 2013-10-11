@@ -1,17 +1,20 @@
 #
-chain @$chsuff
+comment @
+
+chain drop$chsuff acpt$chsuff @$chsuff
 proto @
 
 rule chain($chsuff) target(@$chsuff)
-cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
-# ------------------------------------------
-chain @$chsuff
+cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff -m comment --comment tcp
+#----------------------------------------
 dst $ipinet
 
 target acpt$chsuff
 
-include rtmp gentoo    clients skype server/main
+include rtmp gentoo    clients skype server/main listed_ports
 
-include listed_ports
+target drop$chsuff
 
-# include acpt
+rule comment(for TRACE)
+cmp -A tcpFinet -m tcp -p tcp -d 193.222.140.165 -j dropFinet -m comment --comment "for TRACE"
+

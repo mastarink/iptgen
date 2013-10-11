@@ -2,8 +2,6 @@
   comment drop listed
   target drop$chsuff
 
-  rule src(+badaddress)
-  cmp -A Finet -s +badaddress -j dropFinet -m comment --comment "drop listed"
 
   rule comment(drop-msft) src(+microsoft)
   cmp -A Finet -s +microsoft -j dropFinet -m comment --comment drop-msft

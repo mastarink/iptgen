@@ -1,19 +1,21 @@
 #
+comment @ ^
+
 chain icmp$chsuff $chsuff
 
 
 rule  target(icmp$chsuff) lit(--icmp-type any) proto(icmp)
-cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
+cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff -m comment --comment "icmp local"
 
 
 chain icmp$chsuff
 
 rule target(acpt$chsuff)
-cmp -A icmp$chsuff -j acpt$chsuff
+cmp -A icmp$chsuff -j acpt$chsuff -m comment --comment "icmp local"
 # -A icmp2local -i $LO_IFACE -j acptFlocal
 
-
+target drop$chsuff
 chain drop$chsuff icmp$chsuff
-rule target(drop$chsuff)
-cmp -A icmp$chsuff -j drop$chsuff
-# -A icmp2local -j drop2local
+
+rule comment(for TRACE)
+cmp -A icmp$chsuff -j drop$chsuff -m comment --comment "for TRACE"

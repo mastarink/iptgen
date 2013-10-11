@@ -1,13 +1,13 @@
 #
-  chain drop$chsuff $chsuff
+  comment @ at ^
+  chain @$chsuff $chsuff
   
-  rule target(drop$chsuff)
-  cmp -A $chsuff -j drop$chsuff
-
-  chain drop$chsuff
+#----------------------------------------
 
 # include listed
-include log
-  
-  target DROP ; rule
-  cmp -A drop$chsuff -j DROP
+  chain @$chsuff
+  include log
+
+  target DROP
+  rule comment(for TRACE)
+  cmp -A dropFlan -j DROP -m comment --comment "for TRACE"

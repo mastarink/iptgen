@@ -1,5 +1,6 @@
 #
 chain drop$chsuff
 target DROP
-rule
-cmp -A dropWin -j DROP
+
+rule comment(for TRACE)
+cmp -A dropWin -j DROP -m comment --comment "for TRACE"

@@ -1,6 +1,6 @@
 #
-log-direction=inet
-chsuff=${chpref}$log-direction
+direction=inet
+chsuff=${chpref}$direction
 
 # output $ifinet
 target $chsuff

@@ -9,7 +9,7 @@
   
   include main
 
-  log-direction=all
+  direction=all
   log-plus= (default) $mainchain
   log-message=$log-drop-message
 

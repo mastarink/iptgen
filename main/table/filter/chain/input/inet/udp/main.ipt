@@ -1,19 +1,18 @@
 #
+comment @
 proto @
 chain acpt$chsuff @$chsuff
 
 rule chain($chsuff) target(@$chsuff)
-cmp -A $chsuff -m udp  -p udp   -j udp$chsuff
-
+cmp -A $chsuff -m udp  -p udp   -j udp$chsuff -m comment --comment udp
 # -----------------------------------------------
 target acpt$chsuff
 
-# include acpt 
-include ntp domain skype
-include sopcast
 
-proto -
+include ntp domain     skype sopcast
+
+
 
 target drop$chsuff
-rule
-cmp -A udpFinet -j dropFinet
+rule comment(for TRACE)
+cmp -A udpFinet -m udp -p udp -j dropFinet -m comment --comment "for TRACE"

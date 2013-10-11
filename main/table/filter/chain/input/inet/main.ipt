@@ -1,24 +1,24 @@
 #
-log-direction=@
 
-input $if@
+direction=@
+
+interface $if@
 target $chsuff
 
-rule comment(inputI)
-cmp -A INPUT -i enp2s0 -j $chsuff -m comment --comment inputI
+rule comment($in_out @)
+cmp -A INPUT -i enp2s0 -j $chsuff -m comment --comment "input inet"
 #----------------------------------------
 chain $chsuff
 
 output - ; input - 
-include drop/main
 
-include acpt/main icmp/main tcp/main udp/main
+include drop/before acpt/main icmp/main tcp/main udp/main drop/after
 
 chain drop$chsuff $chsuff
 target drop$chsuff
 
-rule
-cmp -A Finet -j dropFinet
+rule comment(for TRACE)
+cmp -A Finet -j dropFinet -m comment --comment "for TRACE"
 
 
 proto -

@@ -1,24 +1,23 @@
 #
+comment udp local
+
 chain udp$chsuff $chsuff
 
 rule target(udp$chsuff) proto(udp)
-cmp -A $chsuff -m udp  -p udp   -j udp$chsuff
+cmp -A $chsuff -m udp  -p udp   -j udp$chsuff -m comment --comment "udp local"
 
 chain udp$chsuff
 target acpt$chsuff
 
 rule
-cmp -A udp$chsuff -j acpt$chsuff
+cmp -A udp$chsuff -j acpt$chsuff -m comment --comment "udp local"
 
 rule
-cmp -A udp$chsuff -j acpt$chsuff
-# -A udp2local -i $LO_IFACE -j acptFlocal
+cmp -A udp$chsuff -j acpt$chsuff -m comment --comment "udp local"
 
 rule  dpt(domain) proto(udp)
-cmp -A udp$chsuff -m udp -p udp --dport domain -j acpt$chsuff
-# -A udp2local -m udp -p udp --dport domain -j acpt2local
+cmp -A udp$chsuff -m udp -p udp --dport domain -j acpt$chsuff -m comment --comment "udp local"
 
 chain drop$chsuff udp$chsuff
-rule target(drop$chsuff)
-cmp -A udp$chsuff -j drop$chsuff
-# -A udp2local -j drop2local
+rule target(drop$chsuff) comment(for TRACE)
+cmp -A udp$chsuff -j drop$chsuff -m comment --comment "for TRACE"

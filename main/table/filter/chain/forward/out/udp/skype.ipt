@@ -1,13 +1,24 @@
 #
+comment skype
+
+chain @$chsuff &_@$chsuff
+
+proto @
+
+rule chain(@$chsuff) target(&_@$chsuff)
+cmp -A udpWout -m udp -p udp -j skype_udpWout -m comment --comment skype
+#--------------------------------------------------
+
+
 comment skype / fw / out
 # skype
 
 rule dpt($skype-x_port) src(mac.lan) comment(skype-fw 1o)
-cmp -A udpWout -m udp -p udp -s 192.168.71.230 --dport $skype-x_port -j acptWout -m comment --comment "skype-fw 1o"
+cmp -A skype_udpWout -m udp -p udp -s 192.168.71.230 --dport $skype-x_port -j acptWout -m comment --comment "skype-fw 1o"
 
 rule dpt($skype-port-range) src(mac.lan) comment(skype-fw 2o)
-cmp -A udpWout -m udp -p udp  -s 192.168.71.230 --dport 40000:49500  -j acptWout -m comment --comment "skype-fw 2o"
+cmp -A skype_udpWout -m udp -p udp  -s 192.168.71.230 --dport 40000:49500  -j acptWout -m comment --comment "skype-fw 2o"
 
 rule spts($skype-incoming-ports) src(mac.lan) comment(skype-fw 3o)
-cmp -A udpWout -m udp -p udp -s 192.168.71.230 -m multiport --sports 46528,64231 -j acptWout -m comment --comment "skype-fw 3o"
+cmp -A skype_udpWout -m udp -p udp -s 192.168.71.230 -m multiport --sports 46528,64231 -j acptWout -m comment --comment "skype-fw 3o"
 

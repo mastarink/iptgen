@@ -1,11 +1,11 @@
 #
-chain acpt$chsuff udp$chsuff
+comment @ ^
 
+chain acpt$chsuff udp$chsuff
 
 proto udp
 rule chain($chsuff) target(udp$chsuff)
-cmp -A $chsuff -m udp  -p udp   -j udp$chsuff
-
+cmp -A $chsuff -m udp  -p udp   -j udp$chsuff -m comment --comment "udp lan"
 # -----------------------------------------------
 target acpt$chsuff
 
@@ -13,8 +13,8 @@ include domain      avahi             samba skype
 # include acpt
 
 
-spt - ; dpt - ; comment - ; proto -
+# spt - ; dpt - ; proto -
 
 
-rule target(drop$chsuff)
-cmp -A udp$chsuff -j drop$chsuff
+# rule target(drop$chsuff)
+# cmp -A udp$chsuff -j drop$chsuff -m comment --comment "udp lan"

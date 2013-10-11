@@ -1,5 +1,5 @@
 #  
-  rule target(DROP)
-  cmp -A FORWARD -j DROP
+include log
 
-#
+# rule target(DROP)
+# cmp -A FORWARD -j DROP

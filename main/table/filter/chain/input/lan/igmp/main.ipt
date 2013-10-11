@@ -1,19 +1,20 @@
 #
+comment @ at $direction
+
 chain acpt$chsuff @$chsuff
 proto @
 
 rule chain($chsuff) target(@$chsuff)
-cmp -A Flan -p igmp -j igmpFlan
+cmp -A Flan -p igmp -j igmpFlan -m comment --comment "igmp at lan"
 #----------------------------------------
 
 target acpt$chsuff
 
 rule src($iplan)
-cmp -A igmpFlan -p igmp -s $iplan -j acptFlan
-
+cmp -A igmpFlan -p igmp -s $iplan -j acptFlan -m comment --comment "igmp at lan"
 #----------------------------------------
 
 chain @$chsuff
 
-rule target(drop$chsuff)
-cmp -A igmpFlan -p igmp -j dropFlan
+rule target(drop$chsuff) comment(for TRACE)
+cmp -A igmpFlan -p igmp -j dropFlan -m comment --comment "for TRACE"

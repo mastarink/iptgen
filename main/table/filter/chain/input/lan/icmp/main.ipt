@@ -1,9 +1,11 @@
 #
+comment @ ^
+
 chain acpt$chsuff @$chsuff
 proto @
 
 rule chain($chsuff) target(@$chsuff) icmp-type(any)
-cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff
+cmp -A $chsuff -m icmp -p icmp  --icmp-type any -j icmp$chsuff -m comment --comment "icmp lan"
 #----------------------------------------
 
 target acpt$chsuff
@@ -13,7 +15,5 @@ include nmap ping
 dst - ; src -
 
 chain drop$chsuff @$chsuff
-rule target(drop$chsuff) proto(-)
-cmp -A icmpFlan -j dropFlan
-
-# include acpt
+rule target(drop$chsuff) proto(-) comment(for TRACE)
+cmp -A icmpFlan -j dropFlan -m comment --comment "for TRACE"

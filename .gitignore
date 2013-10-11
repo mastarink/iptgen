@@ -8,3 +8,6 @@ built.diff
 *.txt
 *.ip
 *.good
+.*.sw*
+.swp
+iptables-S*

@@ -1,22 +1,23 @@
 #
-log-direction=@
+comment ^ @
+direction=@
 
-output $if@
+interface $if@
 target $chsuff
 
-rule comment(outputA)
-cmp -A OUTPUT -o enp4s0 -j $chsuff -m comment --comment outputA
+rule comment($in_out $direction)
+cmp -A OUTPUT -o enp4s0 -j $chsuff -m comment --comment "output lan"
 #----------------------------------------
 output - ; input - 
 
-include acpt/main 
+include acpt/main
 include icmp/main tcp/main udp/main igmp/main drop/main vbox
 
 chain drop$chsuff $chsuff
 target drop$chsuff
 
-rule
-cmp -A 2lan -j drop2lan
+rule comment(for TRACE)
+cmp -A 2lan -j drop2lan -m comment --comment "for TRACE"
 
 
 proto -

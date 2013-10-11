@@ -1,17 +1,16 @@
 #
-chain @$chsuff
+comment @ ^
+
+chain drop$chsuff acpt$chsuff @$chsuff
 proto @
 
 rule chain($chsuff) target(@$chsuff)
-cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
+cmp -A Flan -m tcp  -p tcp   -j tcpFlan -m comment --comment "tcp lan"
 # ------------------------------------------
-chain @$chsuff
-
-
 target acpt$chsuff
+
+
 
 include nmap ssh squid clients skype server/main
 
-
-
-# include acpt
+target drop$chsuff

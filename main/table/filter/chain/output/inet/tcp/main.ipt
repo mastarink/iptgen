@@ -1,18 +1,20 @@
 #
-chain drop$chsuff  acpt$chsuff @$chsuff
+comment @
+
+chain drop$chsuff acpt$chsuff @$chsuff
 proto @
 
 rule chain($chsuff) target(@$chsuff)
-cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff
+cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff -m comment --comment tcp
 #----------------------------------------
+# src $ipinet
+
 target acpt$chsuff
 
-
-
-include nmap whois im mail http radio gentoo github git/main skype server/main
+include nmap whois im mail http/main radio gentoo github git/main skype server/main
 
 target drop$chsuff
-rule
 
+rule comment(for TRACE)
+cmp -A tcp2inet -m tcp -p tcp -j drop2inet -m comment --comment "for TRACE"
 
-# include acpt drop

@@ -9,19 +9,10 @@ cmp -A $chsuff -m udp  -p udp   -j udp$chsuff -m comment --comment udp
 target acpt$chsuff
 
 
-rule gid-owner($gid-mastar-xmpp) dpt($ssdp_port) comment(IM client/SSDP)
-cmp -A udp2inet -m udp -p udp --dport 1900 -m owner --gid-owner 1073 -j acpt2inet -m comment --comment "IM client/SSDP"
-
-include ntp domain skype sopcast
-
-spt - ; dpt -
-
-# include acpt
-
-comment -
-
-rule target(drop$chsuff) proto(-)
-cmp -A udp$chsuff -j drop$chsuff
-# -A udp2inet -j udp_drop2inet
+include ntp domain ssdp skype sopcast
 
 
+
+target drop$chsuff
+rule comment(for TRACE)
+cmp -A udp2inet -m udp -p udp -j drop2inet -m comment --comment "for TRACE"

@@ -1,15 +1,17 @@
 #
   log-way=to
   chpref=2
+  in_out=&
   mainchain=OUTPUT
+#  log-way,chpref,in_out,mainchain  are ~synonyms 
   chain ${chpref}inet ${chpref}lan ${chpref}local $mainchain
 
   proto -
-  wd output
+  wd &
   
   include main
 
-  log-direction=all
+  direction=all
   log-plus= (default) DROP $mainchain
   log-message=$log-drop-message
 

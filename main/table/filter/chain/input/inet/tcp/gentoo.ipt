@@ -1,16 +1,19 @@
 #
 comment &
 
+chain gentoo_@$chsuff $chsuff
+rule chain(@$chsuff) target(gentoo_@$chsuff)
+
+#----------------------------------------
+chain gentoo_@$chsuff
+
 rule spt(rsync) src(+rsync-gentoo)
-cmp -A tcp$chsuff -m tcp -p tcp -s 5.9.69.110,91.186.30.235,140.211.166.189,209.177.148.226 --sport rsync -d $ipinet -j acptFinet -m comment --comment gentoo
-# -A tcpFinet $TCP_INET_IN_OPTS -s $RSYNC_GENTOO_LIST --sport rsync                      -j ask_gentoo -m comment --comment gentoo
+cmp -A gentoo_tcp$chsuff -m tcp -p tcp -s 5.9.69.110,91.186.30.235,140.211.166.189,209.177.148.226 --sport rsync -d $ipinet -j acptFinet -m comment --comment gentoo
 
 rule spt(git) src(+git-gentoo)
-cmp -A tcp$chsuff -m tcp -p tcp -s +git-gentoo --sport git -d $ipinet -j acptFinet -m comment --comment gentoo
-# -A tcpFinet $TCP_INET_IN_OPTS -s $GIT_GENTOO_LIST   --sport git                        -j ask_gentoo -m comment --comment gentoo
+cmp -A gentoo_tcp$chsuff -m tcp -p tcp -s +git-gentoo --sport git -d $ipinet -j acptFinet -m comment --comment gentoo
 
 rule src(+ftp-gentoo) spt(ftp) helper(ftp)
-cmp -A tcpFinet -m tcp -p tcp -m helper --helper ftp -s +ftp-gentoo --sport ftp -d $ipinet -j acptFinet -m comment --comment gentoo
-# -A tcpFinet $TCP_INET_IN_OPTS -s $FTP_GENTOO_LIST   --sport ftp -m helper --helper ftp -j ask_gentoo -m comment --comment gentoo
+cmp -A gentoo_tcpFinet -m tcp -p tcp -m helper --helper ftp -s +ftp-gentoo --sport ftp -d $ipinet -j acptFinet -m comment --comment gentoo
 
 target -
