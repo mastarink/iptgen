@@ -2,5 +2,5 @@
 comment samba
 
 rule dpts(netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds) src($iplan) dst($iplan)
-cmp -A udp2lan -m udp -p udp -s 192.168.70.0/23 -d 192.168.70.0/23 -m multiport --dports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds -j acpt2lan -m comment --comment samba
+cmp -A udp2lan -m udp -p udp -s $iplan -d $iplan -m multiport --dports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds -j acpt2lan -m comment --comment samba
 

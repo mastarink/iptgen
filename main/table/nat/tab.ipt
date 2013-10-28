@@ -22,7 +22,11 @@
 
     rule src(mac.lan)
     cmp -A POSTROUTING -o enp2s0 -s 192.168.71.230 -j MASQUERADE
+    
     rule src(+virtualbox)
     cmp -A POSTROUTING -o enp2s0 -s 192.168.70.192/23 -j MASQUERADE
+
+    rule src(+vboxnet)
+    cmp -A POSTROUTING -o enp2s0 -s 192.168.62.0/24 -j MASQUERADE
 
   table  end nat

@@ -1,0 +1,28 @@
+#
+comment drop before
+
+chain @$chsuff @_bef$chsuff
+proto -
+
+rule chain($chsuff) target(@_bef$chsuff)
+cmp -A Finet -j drop_befFinet -m comment --comment "drop before"
+#----------------------------------------
+target @$chsuff
+
+rule foreign(+bad-before) comment(drop before)
+cmp -A drop_befFinet -s +bad-before -j dropFinet -m comment --comment "drop before"
+
+# rule src(+bad-before) comment(drop before)
+# cmp -A drop_befFinet -s +bad-before -j dropFinet -m comment --comment "drop before"
+
+
+
+# include listed
+# chain @$chsuff
+# include log
+
+
+# chain @$chsuff
+# target DROP
+# rule comment(for TRACE)
+# cmp -A dropFinet -j DROP -m comment --comment "for TRACE"

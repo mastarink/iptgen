@@ -1,5 +1,5 @@
-  log-way=from
   chpref=W
+  log-way=$chpref
   mainchain=FORWARD
   chain ${chpref}in ${chpref}out $mainchain
 
@@ -9,7 +9,7 @@
   include main
 
   direction=all
-  log-plus= (default) DROP $mainchain
+  log-plus= (def) DROP $mainchain
   log-message=$log-drop-message
 
   include final

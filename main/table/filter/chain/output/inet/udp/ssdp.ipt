@@ -1,0 +1,4 @@
+#
+rule gid-owner($gid-mastar-xmpp) dpt($ssdp_port) comment(IM client/SSDP)
+cmp -A udp2inet -m udp -p udp --dport 1900 -m owner --gid-owner 1073 -j acpt2inet -m comment --comment "IM client/SSDP"
+

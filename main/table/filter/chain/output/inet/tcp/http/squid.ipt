@@ -1,0 +1,5 @@
+#
+comment squid
+
+rule gid-owner($gid-squid)
+cmp -A http_tcp2inet -m tcp -p tcp -m owner --gid-owner 31 -j acpt2inet -m comment --comment squid

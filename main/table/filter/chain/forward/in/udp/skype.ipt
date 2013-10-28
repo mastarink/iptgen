@@ -1,0 +1,22 @@
+#
+comment skype
+
+chain @$chsuff &_@$chsuff
+
+proto @
+
+rule chain(@$chsuff) target(&_@$chsuff)
+cmp -A udpWin -m udp -p udp -j skype_udpWin -m comment --comment skype
+#--------------------------------------------------
+
+# skype
+rule spt($skype-x_port) dst(mac.lan) comment(skype-fw 1i)
+cmp -A skype_udpWin -m udp -p udp --sport $skype-x_port -d 192.168.71.230 -j acptWin -m comment --comment "skype-fw 1i"
+rule spt($skype-port-range) dst(mac.lan) comment(skype-fw 2i)
+cmp -A skype_udpWin -m udp -p udp --sport 40000:49500  -d 192.168.71.230 -j acptWin -m comment --comment "skype-fw 2i"
+rule spts($skype-incoming-ports) dst(mac.lan) comment(skype-fw 3i)
+cmp -A skype_udpWin -m udp -p udp -m multiport --sports 46528,64231 -d 192.168.71.230 -j acptWin -m comment --comment "skype-fw 3i"
+rule dpts($skype-incoming-ports) dst(mac.lan) comment(skype-fw 3i)
+cmp -A skype_udpWin -m udp -p udp -d 192.168.71.230 -m multiport --dports 46528,64231 -j acptWin -m comment --comment "skype-fw 3i"
+
+

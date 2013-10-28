@@ -1,5 +1,4 @@
 #
   log-message=$log-drop-message
   rule target(LOG) $log-options
-  cmp -A drop$chsuff -j LOG --log-prefix "ipt4: NOT to $direction" --log-uid $log-xoptions --log-level 7 -m comment --comment "drop at lan"
-  # -A drop2local -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK from $chsuff " $IPTABLES_LOG_OPTS
+  cmp -A drop$chsuff -j LOG --log-prefix "ipt4: drop2lan" --log-uid $log-xoptions --log-level 7 -m comment --comment "drop at lan"

@@ -5,3 +5,6 @@ chain acpt$chsuff $chsuff
 
 rule proto(all) target(acpt$chsuff) src(+virtualbox)
 cmp -A ${chpref}lan -p all -s 192.168.70.192/23 -j acpt2lan -m comment --comment "lan vbox"
+
+rule proto(all) target(acpt$chsuff) src(+vboxnet)
+cmp -A ${chpref}lan -p all -s 192.168.62.0/24 -j acpt2lan -m comment --comment "lan vbox"

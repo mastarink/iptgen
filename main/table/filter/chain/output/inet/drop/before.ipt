@@ -1,0 +1,28 @@
+#
+comment drop before
+
+chain @$chsuff @_bef$chsuff
+proto -
+
+rule chain($chsuff) target(@_bef$chsuff)
+cmp -A 2inet -j drop_bef2inet -m comment --comment "drop before"
+#----------------------------------------
+target @$chsuff
+
+rule foreign(+bad-before) comment(drop before)
+cmp -A drop_bef2inet -d +bad-before -j drop2inet -m comment --comment "drop before"
+
+# rule dst(+bad-before) comment(drop before)
+# cmp -A drop_bef2inet -d +bad-before -j drop2inet -m comment --comment "drop before"
+
+
+
+# include listed
+# chain @$chsuff
+# include log
+
+
+# chain @$chsuff
+# target DROP
+# rule comment(for TRACE)
+# cmp -A drop2inet -j DROP -m comment --comment "for TRACE"

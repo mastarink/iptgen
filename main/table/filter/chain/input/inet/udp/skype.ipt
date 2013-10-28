@@ -1,10 +1,16 @@
 #
 comment &
+chain &_@$chsuff
+
+rule chain(@$chsuff) target(&_@$chsuff)
+cmp -A udp$chsuff -m udp  -p udp -j skype_udp$chsuff -m comment --comment skype
+#----------------------------------------
+
 
 rule spt($skype-x_port) dst($ipinet) comment(& 1i)
-cmp -A udpFinet -m udp -p udp --sport $skype-x_port -d 193.222.140.165 -j acpt$chsuff -m comment --comment "skype 1i"
+cmp -A skype_udpFinet -m udp -p udp --sport $skype-x_port -d 193.222.140.165 -j acpt$chsuff -m comment --comment "skype 1i"
 
 rule dpts($skype-incoming-ports) dst($ipinet) comment(& 2i)
-cmp -A udpFinet -m udp -p udp -d 193.222.140.165 -m multiport --dports 46528,64231 -j acpt$chsuff -m comment --comment "skype 2i"
+cmp -A skype_udpFinet -m udp -p udp -d 193.222.140.165 -m multiport --dports 46528,64231 -j acpt$chsuff -m comment --comment "skype 2i"
 
 

@@ -1,0 +1,17 @@
+#
+# comment @ at ^
+  chain @$chsuff $chsuff
+  
+#----------------------------------------
+  rule src(+bad-after) target(@$chsuff) comment(drop after)
+  cmp -A Finet -s +bad-after -j dropFinet -m comment --comment "drop after"
+
+  include listed
+  chain @$chsuff
+  include log
+
+
+  chain @$chsuff
+  target DROP
+  rule comment(for TRACE)
+  cmp -A dropFinet -j DROP -m comment --comment "for TRACE"

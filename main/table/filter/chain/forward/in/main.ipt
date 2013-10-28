@@ -6,6 +6,8 @@ target $chsuff
 
 rule comment(@ forwardO)
 cmp -A FORWARD -i enp2s0 -o enp4s0 -j $chsuff -m comment --comment "in forwardO"
+rule output(vboxnet0) comment(@ forwardO)
+cmp -A FORWARD -i enp2s0 -o vboxnet0 -j $chsuff -m comment --comment "in forwardO"
 #----------------------------------------
 output - ; input - 
 include acpt/main icmp/main tcp/main udp/main drop/main

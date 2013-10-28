@@ -2,5 +2,5 @@
 comment samba
 
 rule src($iplan) spts(netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds)
-cmp  -A udp$chsuff -m udp -p udp -s 192.168.70.0/23 -m multiport --sports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds -j acpt$chsuff -m comment --comment samba
+cmp  -A udp$chsuff -m udp -p udp -s $iplan -m multiport --sports netbios-ns,netbios-ssn,netbios-dgm,microsoft-ds -j acpt$chsuff -m comment --comment samba
 

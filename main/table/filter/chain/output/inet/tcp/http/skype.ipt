@@ -1,0 +1,14 @@
+#
+comment ^ @ for skype
+chain &_@$chsuff
+
+rule chain(@$chsuff) target(&_@$chsuff)
+cmp -A http2inet -m tcp  -p tcp -j skype_http2inet -m comment --comment "tcp http for skype"
+# ------------------------------------
+
+
+
+
+rule gid-owner($gid-mastar-skype) target(drop$chsuff)
+cmp -A skype_http2inet -m tcp -p tcp -m owner --gid-owner 1068 -j drop2inet -m comment --comment "tcp http for skype"
+

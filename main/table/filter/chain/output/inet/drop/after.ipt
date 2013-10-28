@@ -1,0 +1,17 @@
+#
+# comment @ at ^
+  chain @$chsuff $chsuff
+  
+#----------------------------------------
+  rule dst(+bad-after) target(@$chsuff) comment(drop after)
+  cmp -A 2inet -d +bad-after -j drop2inet -m comment --comment "drop after"
+
+  include listed
+  chain @$chsuff
+  include log
+
+
+  chain @$chsuff
+  target DROP
+  rule comment(for TRACE)
+  cmp -A drop2inet -j DROP -m comment --comment "for TRACE"

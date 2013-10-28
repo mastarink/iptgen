@@ -1,0 +1,12 @@
+#
+comment gentoo
+
+chain gentoo_@$chsuff $chsuff
+rule chain(@$chsuff) target(gentoo_@$chsuff)
+
+#----------------------------------------
+chain gentoo_@$chsuff
+
+rule spt(rsync) src(+rsync-gentoo) dst(+virtualbox,+vboxnet)
+cmp -A gentoo_tcp$chsuff -m tcp -p tcp -s +rsync-gentoo --sport rsync -d 192.168.62.0/24,192.168.70.192/23 -j acptWin -m comment --comment gentoo
+

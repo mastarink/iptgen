@@ -5,3 +5,7 @@ comment vbox
 rule dst(+virtualbox) spts($http-ports) ctstate(RELATED,ESTABLISHED)
 cmp -A tcpWin -m tcp -p tcp -m multiport --sports http,https -d 192.168.70.192/23 -m conntrack --ctstate RELATED,ESTABLISHED -j acptWin -m comment --comment vbox
 
+rule dst(+vboxnet) spts($http-ports) ctstate(RELATED,ESTABLISHED)
+cmp -A tcpWin -m tcp -p tcp -m multiport --sports http,https -d 192.168.62.0/24 -m conntrack --ctstate RELATED,ESTABLISHED -j acptWin -m comment --comment vbox
+
+include gentoo

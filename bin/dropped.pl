@@ -27,6 +27,8 @@ sub main
     
     # TRACE: filter:dropFinet:return:33
     $param{_filter}=[$1 , $2 ,$3] if /TRACE\:\s*filter\:(drop|acpt)(2|F|W)(inet|lan|local|in|out)/;
+#    ipt4: dropFinet"
+    $param{_filter}=[$1 , $2 ,$3] if /ipt4\:\s*(drop|acpt)(2|F|W)(inet|lan|local|in|out)/;
     push @{$param{_dir}}, qw/main table filter chain/;
     push @{$param{_dir}}, 'output' if ($param{_filter}->[1] eq '2');
     push @{$param{_dir}}, 'input' if ($param{_filter}->[1] eq 'F');
@@ -34,6 +36,8 @@ sub main
     push @{$param{_dir}}, $param{_filter}->[2];
     $param{src}=$1 if /\bSRC=(\d+\.\d+\.\d+\.\d+)\b/;
     $param{dst}=$1 if /\bDST=(\d+\.\d+\.\d+\.\d+)\b/;
+    $param{src}='INET' if $param{src} eq '193.222.140.165';
+    $param{dst}='INET' if $param{dst} eq '193.222.140.165';
     $param{spt}=$1 if /\bSPT=(\d+)\b/;
     $param{dpt}=$1 if /\bDPT=(\d+)\b/;
     $param{proto}=lc $1 if /\bPROTO=(\w*)\b/;

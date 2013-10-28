@@ -18,3 +18,5 @@ comment dhcp_vb
 
 each +vbox-mac rule macsrc(%)
 
+
+# each +vboxnet-mac rule macsrc(%)

@@ -7,6 +7,8 @@ target $chsuff
 
 rule comment($in_out $direction)
 cmp -A INPUT -i enp4s0 -j $chsuff -m comment --comment "input lan"
+rule input(vboxnet0) comment($in_out $direction)
+cmp -A INPUT -i vboxnet0 -j $chsuff -m comment --comment "input lan"
 #----------------------------------------
 output - ; input - 
 

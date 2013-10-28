@@ -1,7 +1,7 @@
 ipinet=193.222.140.165
-iplan=192.168.70.0/23
+iplan=+vboxnet,192.168.70.0/23
 iplan-x=10.0.2.0/24,$iplan
-
+# test=$iplan,$iplan-x
 # ipvbox=192.168.70.192/23
 
 # ipmoldova=188.244.26.74,188.244.26.91

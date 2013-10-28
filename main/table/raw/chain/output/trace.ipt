@@ -1,0 +1,5 @@
+#
+  comment trace
+
+  rule
+  cmp -A OUTPUT -j TRACE -m comment --comment trace

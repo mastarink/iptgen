@@ -1,5 +1,5 @@
-sopcast : off
-trace : off
+# sopcast : off
+# trace : off
 
 # log : off
 # nmap : off

@@ -1,5 +1,5 @@
 #
   log-message=$log-drop-message
   rule target(LOG) $log-options
-  cmp -A drop$chsuff -j LOG --log-prefix "ipt4: NOT from $direction" --log-uid $log-xoptions --log-level 7
+  cmp -A drop$chsuff -j LOG --log-prefix "ipt4: dropFinet" --log-uid $log-xoptions --log-level 7
   # -A drop$chsuff -j LOG --log-prefix "$IPT_PREF_PREF: $LOG_NOT_MARK from inet " $IPTABLES_LOG_OPTS

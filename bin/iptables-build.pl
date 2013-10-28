@@ -19,6 +19,8 @@ use v5.6.0;
 use Net::DNS::Resolver;
 use Net::IP;
 
+my @ftest;
+
 my $current_build_file;
 
 my $incdir;
@@ -125,6 +127,23 @@ sub resolve
 # outmsg __LINE__,"resolve J: $name : ".join(',', @result)."\n";
   return @result;
 }
+sub ip_compare
+{
+  my ($a,$b)=@_;
+  if ($a && $b && $a!~/:/ && $b!~/:/)
+  {
+    $a=~s/\/\d+$//;
+    $b=~s/\/\d+$//;
+    my $ip1 = new Net::IP ($a);
+    my $ip2 = new Net::IP ($b);
+    die "Bad address $a" if (!$ip1);
+    die "Bad address $b" if (!$ip2);
+  # print '########## 1:',$ip1->ip(),'              2:',$ip2->ip()," CMP:",($ip1->intip() <=> $ip2->intip()),"\n";
+    return $ip1->intip() <=> $ip2->intip();
+  }
+  else
+  {  return 0;  }
+}
 sub make_address_array
 {
   my (@addresses)=map { split /\s*,\s*/ } @_;
@@ -132,7 +151,14 @@ sub make_address_array
 # outmsg __LINE__, "A ".join(';',@addresses);
   for my $address (@addresses)
   {
-    if ($confdir && ($address=~/^\s*\+(.*?)\s*$/ || $address=~/^\s*include\b\s*(.*?)\s*$/))
+    if ($address=~/^\s*include\s+(.*)$/)
+    {    
+      my(@ipst, @iplines);
+      @iplines=map {'+'.$_} map { split /\s+/ } $1;
+      @ipst=make_address_array(@iplines);
+      push(@ips, @ipst);
+    }
+    elsif ($confdir && ($address=~/^\s*\+([\w\-\/]+?)\s*$/))
     {
       local *ipfile;
       my @names=split(/\s+/, $1);
@@ -145,12 +171,9 @@ sub make_address_array
 	  my @iplines=grep !/^\s*#/, <ipfile>;
 	  chomp @iplines;      
 	  close ipfile;
-#	  outmsg __LINE__,">>IP>> ( $ipfname ) -- ".join(';',@iplines);
 	  my @ipst;
-	  @ipst=map { make_address_array($_) } @iplines;
-#	  outmsg __LINE__,"!!IP!! ( $ipfname ) -- ".join(';',@iplines);
+	  @ipst=make_address_array(@iplines);
 	  push(@ips, @ipst);
-#	  outmsg __LINE__,"<<IP<< ( $ipfname ) -- ".join(';',@iplines);
 	}
 	else
 	{
@@ -163,13 +186,17 @@ sub make_address_array
       push @ips, $1;
 #     push @ips, split /\s*,\s*/, $1;
     }
-    elsif ($address!~/^\d+\.\d+\.\d+\.\d+(\/\d+|)$/)
+    elsif ($address=~/^\d+\.\d+\.\d+\.\d+(\/\d+|)$/)
     { 
+      push @ips, ($address);
+    }
+    elsif ($address=~/^([\w\-\.]+\.[\w\-]+)$/)
+    {
       my @ipsr=resolve($address);
-#     outmsg __LINE__, "resolve C ".join(',',@ipsr);
       if ($#ipsr<0)
       {
 	outerr __LINE__, "wrong address '$address'";
+	die("wrong address '$address'");
       }
       else
       {
@@ -178,36 +205,27 @@ sub make_address_array
     }
     else
     {
-      push @ips, ($address);
-#     outmsg __LINE__, "D ".join(',',@ips);
+      die("Is it bad: [$address]");
     }
   }
 # outmsg __LINE__, "Z ".join(';',@ips);
+  die("?? ") if !@ips;
   my %ips;
   $ips{$_}=1 for (@ips);
-  return keys %ips;
+  return  sort( {ip_compare($a, $b)}  keys %ips);
 }
-sub ip_compare
+
+sub make_address_list
 {
-  my ($a,$b)=@_;
-  if ($a!~/:/ && $b!~/:/)
-  {
-    my $ip1 = new Net::IP ($a);
-    my $ip2 = new Net::IP ($b);
-  # print '########## 1:',$ip1->ip(),'              2:',$ip2->ip()," CMP:",($ip1->intip() <=> $ip2->intip()),"\n";
-    return $ip1->intip() <=> $ip2->intip();
-  }
-  else
-  {  return 0;  }
-}
-sub make_address
-{
-  return join(',', sort( {ip_compare($a, $b)} make_address_array( @_)));
+  my $r;
+  
+  $r=join(',', make_address_array( @_  ));
+  return $r;
 }
 sub make_address_x
 {
   my (@a)=map {'+'.$_} map { split /\s*,\s*/ } @_; 
-  return make_address @a;
+  return make_address_list @a;
 }
 sub make_comment
 {
@@ -242,6 +260,7 @@ sub make_substitution
     $subs=0;
     for (@$command)
     {
+      my $fl=/virtual/;
       if (s/\$\{([\w\-]+)\}/$variables{$1}/)
       {
         outerr __LINE__, "variable '$1' not defined" unless exists($variables{$1});
@@ -252,8 +271,9 @@ sub make_substitution
         outerr __LINE__, "variable '$1' not defined" unless exists($variables{$1});
 	$subs++;
       }
-      $subs++      if (s/(\+[\w\-]+)\b/make_address($1)/e);
-      $subs++      if (s/(\+\{([\w\-\,]+)\b\})/make_address_x($2)/e);
+#     $subs++      if (s/(\+[\+\w\-\,\/\.]+)\b/make_address_list($1)/e);
+      $subs++      if (s/(\+[\w\-\/]+)\b/make_address_list($1)/ge);
+      $subs++      if (s/(\+\{([\w\-\,\/]+)\b\})/make_address_x($2)/e);
     }
   } while $subs>0;
 # outmsg __LINE__, join(';', @$command);
@@ -343,7 +363,8 @@ sub make_command_rule
 		 'not-dpt'=>{name=>'-dport', order=>1040, prefix=>'!'},
 		 dpts=>{name=>'-dports', order=>1040, module=>{dpts=>'multiport'}},
 		 'not-dpts'=>{name=>'-dports', order=>1040, module=>{'not-dpts'=>'multiport'}, prefix=>'!'},
-		 dst=>{name=>'d', order=>1030, process=>'make_address'},
+		 dst=>{name=>'d', order=>1030, process=>'make_address_list'},
+		 foreign=>{name=>{input=>'s', output=>'d'}, order=>1030, process=>'make_address_list'},
 		 helper=>{name=>'-helper', order=>200, module=>{helper=>'helper'}},
 		 input=> {name=>'i', order=>110},
 		 lit=>{name=>'', order=>80000},
@@ -355,7 +376,7 @@ sub make_command_rule
 		 'not-spt'=>{name=>'-sport', order=>1020, prefix=>'!'},
 		 spts=>{name=>'-sports', order=>1020, module=>{spts=>'multiport'}},
 		 'not-spts'=>{name=>'-sports', order=>1020, module=>{'not-spts'=>'multiport'}, prefix=>'!'},
-		 src=>{name=>'s', order=>1010, process=>'make_address'},
+		 src=>{name=>'s', order=>1010, process=>'make_address_list'},
 		 tail=>{name=>'', order=>100000},
 		 target=>{name=>'j', order=>100000},
 	      );
@@ -410,7 +431,7 @@ sub make_command_rule
       if (exists $names{$name}->{process} )
       {
         my $process=$names{$name}->{process};
- 	$opts{$name}=eval "$process('$opts{$name}')"
+ 	$opts{$name}=eval "$process('$opts{$name}')";
       }
       {
         my $line;
@@ -436,7 +457,12 @@ sub make_command_rule
 	{
 	  my $prefix;
 	  $prefix=$names{$name}->{prefix}.' ' if exists($names{$name}->{prefix});
-	  $line.=$prefix.'-'.$names{$name}->{name}.' '.$opts{$name};
+	  {
+	    my $k=$names{$name}->{name};
+	    if (ref($k) eq 'HASH' )
+	    { $k=$k->{$variables{in_out}}; }
+	    $line.=$prefix.'-'.$k.' '.$opts{$name};
+	  }
 	  push @line, $line;
 	}
       }
@@ -560,6 +586,7 @@ sub make_command_array
   }
   elsif ($main eq 'rule')
   {
+    @ftest=grep /\+virtualbox,\+vboxnet/, @$command;
     make_substitution $command;
     make_command_rule @$command;
   }
@@ -983,5 +1010,4 @@ sub main
     print STDERR "#-------------------------\n";
   }
 }
-
 main @ARGV;

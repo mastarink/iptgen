@@ -1,8 +1,15 @@
 #
-#skype
+comment &
+chain &_@$chsuff
+
+rule chain(@$chsuff) target(&_@$chsuff)
+cmp -A tcpFinet -m tcp  -p tcp -d $ipinet -j skype_tcpFinet -m comment --comment skype
+#----------------------------------------
+
 rule spts($skype-incoming-ports) dst($ipinet) comment(skype 1i)
-cmp -A tcpFinet -m tcp -p tcp -m multiport --sports 46528,64231 -d 193.222.140.165 -j acpt$chsuff -m comment --comment "skype 1i"
+cmp -A skype_tcpFinet -m tcp -p tcp -m multiport --sports 46528,64231 -d $ipinet -j acpt$chsuff -m comment --comment "skype 1i"
+
 rule dpts($skype-incoming-ports) dst($ipinet) comment(skype 2i)
-cmp -A tcpFinet -m tcp -p tcp -d 193.222.140.165 -m multiport --dports 46528,64231 -j acpt$chsuff -m comment --comment "skype 2i"
+cmp -A skype_tcpFinet -m tcp -p tcp -d $ipinet -m multiport --dports 46528,64231 -j acpt$chsuff -m comment --comment "skype 2i"
 
 

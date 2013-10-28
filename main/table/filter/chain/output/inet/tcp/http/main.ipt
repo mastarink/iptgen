@@ -1,0 +1,22 @@
+#
+comment ^ @ 
+chain @$chsuff @_^$chsuff
+
+rule chain(^$chsuff) target(@_^$chsuff) dpts($http-portsx)
+cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports http,https,8080 -j http_tcp2inet  -m comment --comment "tcp http"
+# ------------------------------------
+
+#-A http_tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1067  -j acpt2ihttp -m comment --comment "http gid mastar-browser"
+#-A http_tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1024  -j acpt2ihttp -m comment --comment "http gid mastar-http"
+#-A http_tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1022  -j acpt2ihttp_nolog -m comment --comment "http gid mastar-firefox"
+
+include skype squid firefox
+
+# accept ALL http!!
+rule
+cmp -A http_tcp2inet -m tcp -p tcp -j acpt2inet -m comment --comment "tcp http"
+
+target drop$chsuff
+
+# rule
+# cmp -A http_tcp2inet -m tcp -p tcp -j drop2inet

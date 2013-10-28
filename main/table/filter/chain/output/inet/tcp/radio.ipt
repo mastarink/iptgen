@@ -13,9 +13,29 @@ chain &_@$chsuff
 
 # nrcu.gov.ua:8000
 # rule dst(+radio8000) dpt(8000) comment(radio 8000)
-allow +radio8000 8000 radio 8000
+
+# allow +radio8000 8000 radio 8000
+rule dst(+radio8000) dpt(8000) comment(radio 8000)
 cmp -A radio_tcp2inet -m tcp -p tcp -d +radio8000 --dport 8000 -j acpt2inet -m comment --comment "radio 8000"
-allow media.brg.ua 8014 radio 8014
+
+# allow media.brg.ua 8014 radio 8014
+rule dst(+radio8014) dpt(8014) comment(radio 8014)
 cmp -A radio_tcp2inet -m tcp -p tcp -d 217.20.164.163 --dport 8014 -j acpt2inet -m comment --comment "radio 8014"
 
+#allow +radio9046 9046 radio 9046
+rule dst(+radio9046) dpt(9046) comment(radio 9046)
+cmp -A radio_tcp2inet -m tcp -p tcp -d +radio9046 --dport 9046 -j acpt2inet -m comment --comment "radio 9046"
 
+#allow +radio8040 8040 radio 8040
+rule dst(+radio8040) dpt(8040) comment(radio 8040)
+cmp -A radio_tcp2inet -m tcp -p tcp -d +radio8040 --dport 8040 -j acpt2inet -m comment --comment "radio 8040"
+
+#allow +radio8030 8030 radio 8030
+rule dst(+radio8030) dpt(8030) comment(radio 8030)
+cmp -A radio_tcp2inet -m tcp -p tcp -d +radio8030 --dport 8030 -j acpt2inet -m comment --comment "radio 8030"
+
+rule dst(+radio8064) dpt(8064) comment(radio 8064)
+cmp -A radio_tcp2inet -m tcp -p tcp -d +radio8064 --dport 8064 -j acpt2inet -m comment --comment "radio 8064"
+
+rule dst(+radio8006) dpt(8006) comment(radio 8006)
+cmp -A radio_tcp2inet -m tcp -p tcp -d +radio8006 --dport 8006 -j acpt2inet -m comment --comment "radio 8006"

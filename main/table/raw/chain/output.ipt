@@ -1,6 +1,6 @@
 #
-  log-way=from
   chpref=R
+  log-way=$chpref
   mainchain=OUTPUT
 # chain ${chpref}inet ${chpref}lan ${chpref}local $mainchain
 
@@ -10,7 +10,7 @@
   include main
 
   direction=all
-  log-plus= (default) $mainchain
+  log-plus= (def) $mainchain
   log-message=$log-drop-message
 
 # include final
