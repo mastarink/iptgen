@@ -1,20 +1,18 @@
 #
   chain OUTPUT
   
-  rule proto(tcp) dpts($http-ports,445) target(ACCEPT)
-  cmp -A OUTPUT -m tcp -p tcp -m multiport --dports http,https,445 -j ACCEPT
-  
-  
-  rule output($iflocal) target(ACCEPT)
-  cmp -A OUTPUT -o lo -j ACCEPT
-  
-  rule proto(udp) output($ifinet) target(ACCEPT) spts($skype-incoming-ports)
-  cmp -A OUTPUT -o enp2s0 -m udp -p udp  -m multiport --sports 46528,64231 -j ACCEPT
-  
-  rule proto(udp) gid-owner($gid-named) target(ACCEPT)
-  cmp -A OUTPUT -m udp -p udp -m owner --gid-owner 40 -j ACCEPT
+# rule proto(tcp) dpts($http-ports,445) target(ACCEPT)
+# cmp -A OUTPUT -m tcp -p tcp -m multiport --dports http,https,445 -j ACCEPT
+# 
+# 
+# rule output($iflocal) target(ACCEPT)
+# cmp -A OUTPUT -o lo -j ACCEPT
+# 
+# rule proto(udp) output($ifinet) target(ACCEPT) spts($skype-incoming-ports)
+# cmp -A OUTPUT -o enp2s0 -m udp -p udp  -m multiport --sports 46528,64231 -j ACCEPT
+# 
+# rule proto(udp) gid-owner($gid-named) target(ACCEPT)
+# cmp -A OUTPUT -m udp -p udp -m owner --gid-owner 40 -j ACCEPT
 
-# rule proto(icmp) icmp-type(any)
-# rule proto(icmp) icmp-type(any)
 #------------------------------------------------------------
   include trace

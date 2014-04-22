@@ -18,6 +18,7 @@ use v5.6.0;
 
 use Net::DNS::Resolver;
 use Net::IP;
+use IO::Interface::Simple;
 
 my @ftest;
 
@@ -804,9 +805,9 @@ sub build_iptables
 
 sub make_confdir
 {
-  if ($ENV{MAS_CONF_DIR} && -d $ENV{MAS_CONF_DIR})
+  if ($ENV{MSH_CONF_DIR} && -d $ENV{MSH_CONF_DIR})
   {
-    $confdir="$ENV{MAS_CONF_DIR}/iptables-build";
+    $confdir="$ENV{MSH_CONF_DIR}/iptables-build";
     if (-d  $confdir)
     {
       outlog __LINE__,"$confdir exists";
@@ -819,7 +820,7 @@ sub make_confdir
   }
   else
   {
-    outerr __LINE__, "MAS_CONF_DIR not set or directory '$ENV{MAS_CONF_DIR}' not exists";
+    outerr __LINE__, "MSH_CONF_DIR not set or directory '$ENV{MSH_CONF_DIR}' not exists";
   }
   return $confdir;
 }
@@ -889,6 +890,11 @@ sub main
   make_confdir;
   my $save_file="$confdir/iptables.built";
   unlink "$save_file";
+  
+  {
+    my $if0   = IO::Interface::Simple->new('enp2s0');
+    $variables{ipinet}=$if0->address;
+  }
   print STDERR "$save_file\n";
   if ( open save, '>', $save_file )
   {

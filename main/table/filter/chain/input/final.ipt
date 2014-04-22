@@ -1,5 +1,5 @@
 #
 include log
 
-# rule target(DROP)
-# cmp -A INPUT -j DROP
+  rule target(DROP)
+  cmp -A INPUT -j DROP

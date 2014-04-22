@@ -12,7 +12,7 @@ chain $chsuff
 
 output - ; input - 
 
-include drop/before acpt/main icmp/main tcp/main udp/main drop/after
+include check/before acpt/main icmp/main tcp/main udp/main check/after
 
 chain drop$chsuff $chsuff
 target drop$chsuff

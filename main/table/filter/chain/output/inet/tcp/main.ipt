@@ -11,7 +11,7 @@ cmp -A $chsuff -m tcp  -p tcp   -j tcp$chsuff -m comment --comment tcp
 
 target acpt$chsuff
 
-include nmap whois im mail http/main radio gentoo github git/main skype server/main
+include nmap whois im mail ftp http/main radio rtmp gentoo github git/main skype server/main
 
 target drop$chsuff
 

@@ -2,8 +2,8 @@
 comment ^ @ 
 chain @$chsuff @_^$chsuff
 
-rule chain(^$chsuff) target(@_^$chsuff) dpts($http-portsx)
-cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports http,https,8080 -j http_tcp2inet  -m comment --comment "tcp http"
+rule chain(^$chsuff) target(@_^$chsuff) dpts($http-portsxx)
+cmp -A tcp2inet -m tcp  -p tcp -m multiport --dports http,https,8080,843 -j http_tcp2inet  -m comment --comment "tcp http"
 # ------------------------------------
 
 #-A http_tcp2inet $TCP_INET_OUT_OPTS -m multiport --dports $HTTP_PORTS -m owner --gid-owner 1067  -j acpt2ihttp -m comment --comment "http gid mastar-browser"

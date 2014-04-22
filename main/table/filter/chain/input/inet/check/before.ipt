@@ -1,19 +1,19 @@
 #
-comment drop before
+comment check drop before
 
 chain @$chsuff @_bef$chsuff
 proto -
 
 rule chain($chsuff) target(@_bef$chsuff)
-cmp -A Finet -j drop_befFinet -m comment --comment "drop before"
+cmp -A Finet -j check_befFinet -m comment --comment "check drop before"
 #----------------------------------------
 target @$chsuff
 
-rule foreign(+bad-before) comment(drop before)
-cmp -A drop_befFinet -s +bad-before -j dropFinet -m comment --comment "drop before"
+rule foreign(+bad-before) comment(check drop bad before)
+cmp -A check_befFinet -s +bad-before -j checkFinet -m comment --comment "check drop bad before"
 
 # rule src(+bad-before) comment(drop before)
-# cmp -A drop_befFinet -s +bad-before -j dropFinet -m comment --comment "drop before"
+# cmp -A check_befFinet -s +bad-before -j dropFinet -m comment --comment "drop before"
 
 
 

@@ -1,4 +1,4 @@
-ipinet=193.222.140.165
+# ipinet=auto
 iplan=+vboxnet,192.168.70.0/23
 iplan-x=10.0.2.0/24,$iplan
 # test=$iplan,$iplan-x
@@ -15,6 +15,8 @@ squid_port=3128
 
 http-ports=http,https
 http-portsx=$http-ports,8080
+http-portsxx=$http-portsx,843
+# http-portsxx=$http-portsx
 im_ports=xmpp-client,5050,aol
 rtmp_port=1935
 ssdp_port=1900

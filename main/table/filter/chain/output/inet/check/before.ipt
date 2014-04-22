@@ -1,19 +1,19 @@
 #
-comment drop before
+comment check drop before
 
 chain @$chsuff @_bef$chsuff
 proto -
 
 rule chain($chsuff) target(@_bef$chsuff)
-cmp -A 2inet -j drop_bef2inet -m comment --comment "drop before"
+cmp -A 2inet -j check_bef2inet -m comment --comment "check drop before"
 #----------------------------------------
 target @$chsuff
 
-rule foreign(+bad-before) comment(drop before)
-cmp -A drop_bef2inet -d +bad-before -j drop2inet -m comment --comment "drop before"
+rule foreign(+bad-before) comment(check drop bad before)
+cmp -A check_bef2inet -d +bad-before -j check2inet -m comment --comment "check drop bad before"
 
 # rule dst(+bad-before) comment(drop before)
-# cmp -A drop_bef2inet -d +bad-before -j drop2inet -m comment --comment "drop before"
+# cmp -A check_bef2inet -d +bad-before -j drop2inet -m comment --comment "drop before"
 
 
 

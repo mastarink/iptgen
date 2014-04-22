@@ -1,0 +1,17 @@
+#
+comment &
+
+chain ftp_@$chsuff $chsuff
+
+rule chain(@$chsuff) target(ftp_@$chsuff) dst($ipinet) spt(ftp)
+cmp -A tcpFinet -m tcp -p tcp --sport ftp -d 193.222.140.165 -j ftp_tcpFinet -m comment --comment ftp
+
+rule chain(@$chsuff) target(ftp_@$chsuff) dst($ipinet) spt(ftp-data)
+cmp -A tcpFinet -m tcp -p tcp --sport ftp-data -d 193.222.140.165 -j ftp_tcpFinet -m comment --comment ftp
+
+#----------------------------------------
+chain ftp_@$chsuff
+
+
+rule src(+ftp-all) helper(ftp) ctstate(RELATED,ESTABLISHED)
+cmp -A ftp_tcpFinet -m tcp -p tcp -m helper --helper ftp -s +ftp-all -d 193.222.140.165 -m conntrack --ctstate RELATED,ESTABLISHED -j acptFinet -m comment --comment ftp

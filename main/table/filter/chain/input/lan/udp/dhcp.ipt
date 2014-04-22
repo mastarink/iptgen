@@ -1,13 +1,23 @@
+comment &
+
+chain dhcp_@$chsuff $chsuff
+rule chain(@$chsuff) target(dhcp_@$chsuff)
+cmp -A udpFlan -m udp -p udp -j dhcp_udpFlan -m comment --comment dhcp
+
+#----------------------------------------
+chain dhcp_@$chsuff
+
+
 spt bootpc ; dpt bootps
 
 # mike.lan
 rule macsrc(00:0e:2e:26:1b:60) comment(dhcp_mike)
-cmp -A udp$chsuff -m udp -p udp -m mac --mac-source 00:0e:2e:26:1b:60 --sport bootpc --dport bootps -j acpt$chsuff -m comment --comment dhcp_mike
+cmp -A dhcp_udp$chsuff -m udp -p udp -m mac --mac-source 00:0e:2e:26:1b:60 --sport bootpc --dport bootps -j acpt$chsuff -m comment --comment dhcp_mike
 # -A udpFlan -m mac --mac-source 00:0e:2e:26:1b:60 -m udp -p udp --sport bootpc --dport bootps -j acptFlan -m comment --comment dhcp_mike
 
 # mac.lan
 rule macsrc(00:14:51:3b:57:8c) comment(dhcp_mac)
-cmp -A udp$chsuff -m udp -p udp -m mac --mac-source 00:14:51:3b:57:8c --sport bootpc --dport bootps -j acpt$chsuff -m comment --comment dhcp_mac
+cmp -A dhcp_udp$chsuff -m udp -p udp -m mac --mac-source 00:14:51:3b:57:8c --sport bootpc --dport bootps -j acpt$chsuff -m comment --comment dhcp_mac
 # -A udpFlan -m mac --mac-source 00:14:51:3b:57:8c -m udp -p udp --sport bootpc --dport bootps -j acptFlan -m comment --comment dhcp_mac
 
 # gnome400.lan ?
@@ -16,7 +26,9 @@ cmp -A udp$chsuff -m udp -p udp -m mac --mac-source 00:14:51:3b:57:8c --sport bo
 # virtualbox machines
 comment dhcp_vb
 
-each +vbox-mac rule macsrc(%)
+each +vbox-mac-bridged rule macsrc(%)
+
+each +vbox-mac-vboxnet rule macsrc(%)
 
 
 # each +vboxnet-mac rule macsrc(%)

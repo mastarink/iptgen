@@ -3,12 +3,13 @@ comment &
 
 chain gentoo_@$chsuff $chsuff
 rule chain(@$chsuff) target(gentoo_@$chsuff)
+cmp -A tcpFinet -m tcp -p tcp -d 193.222.140.165 -j gentoo_tcpFinet -m comment --comment gentoo
 
 #----------------------------------------
 chain gentoo_@$chsuff
 
 rule spt(rsync) src(+rsync-gentoo)
-cmp -A gentoo_tcp$chsuff -m tcp -p tcp -s 5.9.69.110,91.186.30.235,140.211.166.189,209.177.148.226 --sport rsync -d $ipinet -j acptFinet -m comment --comment gentoo
+cmp -A gentoo_tcp$chsuff -m tcp -p tcp -s +rsync-gentoo --sport rsync -d $ipinet -j acptFinet -m comment --comment gentoo
 
 rule spt(git) src(+git-gentoo)
 cmp -A gentoo_tcp$chsuff -m tcp -p tcp -s +git-gentoo --sport git -d $ipinet -j acptFinet -m comment --comment gentoo

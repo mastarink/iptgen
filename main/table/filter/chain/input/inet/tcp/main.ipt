@@ -11,7 +11,7 @@ dst $ipinet
 
 target acpt$chsuff
 
-include rtmp gentoo    clients skype server/main listed_ports
+include rtmp ftp gentoo    clients skype server/main listed_ports
 
 target drop$chsuff
 

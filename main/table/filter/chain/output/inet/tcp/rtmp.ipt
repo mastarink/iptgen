@@ -1,0 +1,14 @@
+#
+comment rtmp
+
+chain &_@$chsuff @$chsuff
+
+rule target(&_@$chsuff)
+cmp -A tcp2inet -m tcp  -p tcp -j rtmp_tcp2inet  -m comment --comment rtmp
+# ------------------------------------
+chain &_@$chsuff
+
+
+rule dst(+rtmp) dpt($rtmp_port) comment(rtmp)
+cmp -A rtmp_tcp2inet -m tcp -p tcp -d +rtmp --dport 1935 -j acpt2inet -m comment --comment rtmp
+

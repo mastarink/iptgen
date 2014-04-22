@@ -1,6 +1,0 @@
-#
-comment vbox
-
-rule dst(+virtualbox) dpts($http-ports)
-cmp -A tcpWout -m tcp -p tcp -d 192.168.70.192/23 -m multiport --dports http,https -j acptWout -m comment --comment vbox
-
